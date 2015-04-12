@@ -35,6 +35,12 @@ public class MonsterAI : MonoBehaviour
 
     private void Follow()
     {
-        mAgent.SetDestination(m_TargetTs.position);
+        if (m_TargetTs != null)
+            mAgent.SetDestination(m_TargetTs.position);
+    }
+
+    public void SetTarget(Transform targetTs)
+    {
+        m_TargetTs = targetTs;
     }
 }
