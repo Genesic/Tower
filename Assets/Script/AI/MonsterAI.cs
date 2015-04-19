@@ -95,6 +95,11 @@ public abstract class MonsterAI : MonoBehaviour
             SetDeath();
     }
 
+	public int getHp()
+	{
+		return HP;
+	}
+
     protected void SetSpawn()
     {
         StartCoroutine(SpawnHandle());
