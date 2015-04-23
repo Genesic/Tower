@@ -3,6 +3,6 @@ using System.Collections;
 
 public interface ICannon
 {
-    //public int GetPrice();
-   
+    int Cost { get; }
+    int Price { get; }
 }
