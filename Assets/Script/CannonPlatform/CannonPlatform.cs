@@ -1,15 +1,42 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CannonPlatform : MonoBehaviour {
+/// <summary>砲台管理類別</summary>
+public class CannonPlatform : MonoBehaviour
+{
+    private ICannon mCannon = null;
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    public bool IsEmpty { get { return mCannon == null; } }
+    public bool HasCannon { get { return !IsEmpty; } }
+
+    public string ID { get { return name; } }
+
+    public bool PutCannon(ICannon cannon)
+    {
+        if (HasCannon)
+        {
+            Debug.LogErrorFormat("位置:{0} 已放置砲塔:{1}", name, ID);
+            return false;
+        }
+
+        mCannon = cannon;
+
+        return true;
+    }
+
+    public ICannon RemoveCannon()
+    {
+        if (IsEmpty)
+        {
+            Debug.LogErrorFormat("位置:{0} 沒有砲塔可移除", name);
+            return null;
+        }
+
+        var cannon = mCannon;
+
+        mCannon = null;
+
+        return cannon;
+    }
+
 }
