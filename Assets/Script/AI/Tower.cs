@@ -1,16 +1,20 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Tower : MonoBehaviour {
+public class Tower : MonoBehaviour, ICannon {
 	public float searchRadius;
 	public float speed;
 	public int damage;
 	public int cost;
+	public int price;
 	
 	public GameObject shot;
 	public float fireRate;
 	
 	private float nextFire;
+
+	public int Cost { get {return cost; } }
+	public int Price { get {return price; } }
 	
 	// Update is called once per frame
 	void Update () {
@@ -35,6 +39,7 @@ public class Tower : MonoBehaviour {
 				nextFire = Time.time + fireRate;
 				GameObject Bullet = (GameObject)Instantiate (shot, ShotSpwan, transform.rotation);
 				Vector3 direction = (LockCollider.gameObject.transform.position - ShotSpwan).normalized;
+				Debug.Log ("start: " + ShotSpwan + "target: "+ LockCollider.gameObject.transform.position + "direction: "+direction);
 				Bullet.GetComponent<Rigidbody> ().velocity = direction * speed;
 				LockCollider.gameObject.GetComponent<MonsterAI> ().Damage(damage);
 			}

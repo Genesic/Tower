@@ -87,6 +87,11 @@ public abstract class MonsterAI : MonoBehaviour
         mTargetTs = targetTs;
     }
 
+	public int getHp()
+	{
+		return HP;
+	}
+
     public void Damage(int damage)
     {
         HP = Mathf.Max(0, HP - damage);
