@@ -13,6 +13,17 @@ public abstract class MonsterAI : MonoBehaviour
     [SerializeField]
     protected float m_DetectInterval = 0.5f;
 
+    [SerializeField]
+    protected string m_MonsterID = "Unknow";
+
+    [SerializeField]
+    protected MonsterParam m_OriginParam = null;
+
+    [SerializeField]
+    protected MonsterParam m_UseParam = null;
+
+    public string MonsterID { get { return m_MonsterID; } }
+
     protected Transform mTs = null;
 
     protected Transform mTargetTs = null;
@@ -21,11 +32,9 @@ public abstract class MonsterAI : MonoBehaviour
 
     protected NavMeshAgent mAgent = null;
 
-    protected int HP = 100;
-
     private Coroutine mDetectCoroutine = null;
 
-    protected bool IsAlive { get { return HP > 0; } }
+    protected bool IsAlive { get { return m_UseParam.HP > 0; } }
     protected bool IsDeath { get { return !IsAlive; } }
 
     protected virtual void Awake()
@@ -34,8 +43,6 @@ public abstract class MonsterAI : MonoBehaviour
 
         mAgent = GetComponent<NavMeshAgent>();
         mAni = GetComponentInChildren<Animator>();
-
-        SetSpawn();
     }
     
     protected virtual void OnDestroy()
@@ -65,6 +72,28 @@ public abstract class MonsterAI : MonoBehaviour
         }
     }
 
+    public void SetEnable()
+    {
+        gameObject.SetActive(true);
+
+        IninParam();
+    }
+
+    public void SetDisable()
+    {
+        gameObject.SetActive(false);
+    }
+
+    private void IninParam()
+    {
+        m_UseParam.SetTo(m_OriginParam);
+
+        mAgent.enabled = true;
+        mAgent.speed = m_UseParam.MoveSpeed;
+
+        SetSpawn();
+    }
+
     protected void Follow()
     {
         if (mTargetTs != null)
@@ -82,19 +111,29 @@ public abstract class MonsterAI : MonoBehaviour
         }
     }
 
+    public void SetPosition(Vector3 position)
+    {
+        mTs.position = position;
+    }
+
+    public void SetRotation(Quaternion rotation)
+    {
+        mTs.rotation = rotation;
+    }
+
     public void SetTarget(Transform targetTs)
     {
         mTargetTs = targetTs;
     }
 
-	public int getHp()
+    public int getHp()
 	{
-		return HP;
+        return m_UseParam.HP;
 	}
 
     public void Damage(int damage)
     {
-        HP = Mathf.Max(0, HP - damage);
+        m_UseParam.HP = Mathf.Max(0, m_UseParam.HP - damage);
 
         if (IsDeath)
             SetDeath();
@@ -142,9 +181,11 @@ public abstract class MonsterAI : MonoBehaviour
         StopDetect();
         SetAnimTrigger(MonsterAI.DEATH_HASH);
 
-        yield return new WaitForSeconds(0.1f);
+        mAgent.enabled = false;
 
-        //call 回收
+        yield return new WaitForSeconds(5f);
+
+        MonsterPools.Retrieve(this);
     }
 
     protected void SetAttack()
@@ -174,6 +215,19 @@ public abstract class MonsterAI : MonoBehaviour
     protected void SetAnimBool(int hash, bool value)
     {
         mAni.SetBool(hash, value);
+    }
+
+    [System.Serializable]
+    public class MonsterParam
+    {
+        public int HP = 0;
+        public float MoveSpeed = 2f;
+
+        public void SetTo(MonsterParam param)
+        {
+            HP = param.HP;
+            MoveSpeed = param.MoveSpeed;
+        }
     }
 
 }
