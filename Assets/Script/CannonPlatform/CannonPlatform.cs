@@ -48,7 +48,7 @@ public class CannonPlatform : MonoBehaviour
     private void CreateCannon(ICannon cannon)
     {
         //call cost function...
-
+		mCannon = cannon;
         int cost = cannon.Cost;
     }
 

@@ -18,23 +18,36 @@ public class ClickManager : MonoBehaviour {
 		}
 */
 		if (Input.GetMouseButtonDown (0) ) {
-			if( !selectTowerPannel.activeSelf ){
-				openTowerPanel();			
-			} else {
-				//Debug.Log(selectTowerPannel.transform.position);
-				//Debug.Log( selectTowerPannel.GetComponent<RectTransform>().rect);
-				//Debug.Log (Input.mousePosition);
+			check_open_selectTwoerPannel(); // 檢查要不要開啟蓋塔UI
+		}
+	}
 
-				float offset_x = 70;
-				float offset_y = 140;
-				Vector2 start = new Vector2 (selectTowerPannel.transform.position.x - offset_x, selectTowerPannel.transform.position.y + offset_y );
-				Vector2 end = new Vector2 (selectTowerPannel.transform.position.x + offset_x, selectTowerPannel.transform.position.y - offset_y );
-				Vector2 check = Input.mousePosition;
-				if( (check.x > start.x && check.x < end.x) && (check.y > end.y || check.y < start.y) ){
-					// do nothing
-				} else {
-					openTowerPanel();
-				}
+	void check_open_selectTwoerPannel(){
+		if( !selectTowerPannel.activeSelf ){
+			check_raycast_to_open_panel();
+		} else {
+			float offset_x = 70;
+			float offset_y = 140;
+			Vector2 start = new Vector2 (selectTowerPannel.transform.position.x - offset_x, selectTowerPannel.transform.position.y + offset_y );
+			Vector2 end = new Vector2 (selectTowerPannel.transform.position.x + offset_x, selectTowerPannel.transform.position.y - offset_y );
+			Vector2 check = Input.mousePosition;
+			if( (check.x > start.x && check.x < end.x) && (check.y > end.y || check.y < start.y) ){
+				// do nothing
+			} else {
+				check_raycast_to_open_panel();
+			}
+		}
+	}
+
+	void check_raycast_to_open_panel (){
+		RaycastHit hit;
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		if( Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("CannonPlatform") ) ){
+			CannonPlatform selectCannon = hit.transform.gameObject.GetComponent<CannonPlatform>();
+			Debug.Log (selectCannon);
+			if( selectCannon ){
+				selectTowerPannel.GetComponent<TowerManager>().set_useCannon(selectCannon);
+				openTowerPanel();
 			}
 		}
 	}
