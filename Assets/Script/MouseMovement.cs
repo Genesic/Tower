@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MoveCameraView : MonoBehaviour {
+public class MouseMovement : MonoBehaviour {
 
 	public float turnSpeed = 4.0f;		// Speed of camera turning when mouse moves in along an axis
 	public float panSpeed = 4.0f;		// Speed of the camera when being panned
@@ -63,7 +63,7 @@ public class MoveCameraView : MonoBehaviour {
 		{
 			Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - mouseOrigin);
 
-			Vector3 move = new Vector3(- (pos.x * panSpeed), pos.y * panSpeed /2, -(pos.y * panSpeed * 2));
+			Vector3 move = new Vector3(pos.x * panSpeed, 0, pos.y * panSpeed);
 			transform.Translate(move);
 		}
 		
