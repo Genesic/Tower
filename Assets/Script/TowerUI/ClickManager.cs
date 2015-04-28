@@ -18,10 +18,23 @@ public class ClickManager : MonoBehaviour {
 		}
 */
 		if (Input.GetMouseButtonDown (0) ) {
-			RaycastHit hit;
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			if( Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("CannonPlatform") ) ){
-				openTowerPanel();
+			if( !selectTowerPannel.activeSelf ){
+				openTowerPanel();			
+			} else {
+				//Debug.Log(selectTowerPannel.transform.position);
+				//Debug.Log( selectTowerPannel.GetComponent<RectTransform>().rect);
+				//Debug.Log (Input.mousePosition);
+
+				float offset_x = 70;
+				float offset_y = 140;
+				Vector2 start = new Vector2 (selectTowerPannel.transform.position.x - offset_x, selectTowerPannel.transform.position.y + offset_y );
+				Vector2 end = new Vector2 (selectTowerPannel.transform.position.x + offset_x, selectTowerPannel.transform.position.y - offset_y );
+				Vector2 check = Input.mousePosition;
+				if( (check.x > start.x && check.x < end.x) && (check.y > end.y || check.y < start.y) ){
+					// do nothing
+				} else {
+					openTowerPanel();
+				}
 			}
 		}
 	}
@@ -38,7 +51,6 @@ public class ClickManager : MonoBehaviour {
 			newPosition.y += 220.0F;
 		}
 		selectTowerPannel.transform.position = newPosition;
-		Debug.Log ( "origin:" + Input.mousePosition + " new: " + newPosition);
 		selectTowerPannel.SetActive(true);
 	}
 }
