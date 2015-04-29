@@ -3,7 +3,7 @@ using System.Collections;
 
 public abstract class MonoSingleTon<T> : MonoBehaviour where T : MonoSingleTon<T> 
 {
-    protected static T Instance = null;
+    public static T Instance = null;
 
     protected virtual void Awake()
     {

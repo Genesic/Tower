@@ -5,6 +5,7 @@ using System.Collections;
 public class CannonPlatform : MonoBehaviour
 {
     private static readonly Vector3 OFFSET = new Vector3(0f, 0.5f, 0f);
+
     private ICannon mCannon = null;
 
     private Transform mTs = null;
@@ -30,7 +31,7 @@ public class CannonPlatform : MonoBehaviour
             return;
         }
 
-        CreateCannon(cannon);
+        mCannon = cannon;
     }
 
     /// <summary>賣掉砲塔</summary>
@@ -42,23 +43,6 @@ public class CannonPlatform : MonoBehaviour
             return;
         }
 
-        RemoveCannon();
-    }
-
-    private void CreateCannon(ICannon cannon)
-    {
-        //call cost function...
-		mCannon = cannon;
-        int cost = cannon.Cost;
-    }
-
-    private void RemoveCannon()
-    {
-        //call sell function...
-
-        int price = mCannon.Price;
-
         mCannon = null;
     }
-
 }

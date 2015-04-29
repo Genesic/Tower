@@ -32,7 +32,7 @@ public class SoundManager : MonoBehaviour
     {
         Debug.Log(mIndex);
         m_AudioSource.clip = m_AudioClips[mIndex];
-        m_AudioSource.time = 95f;
+        //m_AudioSource.time = 95f;
         m_AudioSource.Play();
 
         while (m_AudioSource.isPlaying)

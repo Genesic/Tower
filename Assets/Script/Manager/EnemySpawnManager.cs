@@ -4,11 +4,9 @@ using System.Collections.Generic;
 
 public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
 {
-    [SerializeField]
-    private Transform m_SpawnTs = null;
+    private Transform SpawnTs { get { return mGameMgr.StageMgr.SpawnTs; } }
 
-    [SerializeField]
-    private Transform m_TargetTs = null;
+    private Transform TargetTs { get { return mGameMgr.StageMgr.TargetTs; } }
 
     [SerializeField]
     private Vector2 m_SpawnOffset = Vector2.zero;
@@ -25,6 +23,8 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
     [SerializeField]
     private MonsterPools m_MonsterPools = null;
 
+    private GameManager mGameMgr = null;
+
     private Coroutine mSpwanCoroutine = null;
 
     private Queue<MonsterAI> mAliveMonsterQueue = new Queue<MonsterAI>();
@@ -32,6 +32,8 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
     protected override void Awake()
     {
         base.Awake();
+
+        mGameMgr = GetComponent<GameManager>();
     }
 
     protected override void OnDestroy()
@@ -66,9 +68,9 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
     {
         var monsterAI = m_MonsterPools.Obtain("tufu");
         monsterAI.SetPosition(GetSpawnPosition());
-        monsterAI.SetRotation(m_SpawnTs.rotation);
+        monsterAI.SetRotation(SpawnTs.rotation);
         monsterAI.SetEnable();
-        monsterAI.SetTarget(m_TargetTs);
+        monsterAI.SetTarget(TargetTs);
 
         mAliveMonsterQueue.Enqueue(monsterAI);
     }
@@ -99,8 +101,8 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
     
     private Vector3 GetSpawnPosition()
     {
-        var origin = m_SpawnTs.position;
-        var pos = m_SpawnTs.rotation * new Vector3(Random.Range(-m_SpawnOffset.x, m_SpawnOffset.x), 0f, Random.Range(-m_SpawnOffset.y, m_SpawnOffset.y));
+        var origin = SpawnTs.position;
+        var pos = SpawnTs.rotation * new Vector3(Random.Range(-m_SpawnOffset.x, m_SpawnOffset.x), 0f, Random.Range(-m_SpawnOffset.y, m_SpawnOffset.y));
 
         return origin + pos;
     }
@@ -124,5 +126,9 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space)) SpawnEnemy();
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            DynamicGI.UpdateEnvironment();
+        }
     }
 }

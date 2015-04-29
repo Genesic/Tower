@@ -4,14 +4,17 @@ using System.Collections.Generic;
 
 public class MonsterPools : MonoSingleTon<MonsterPools>
 {
-    [SerializeField]
-    private Transform m_MonsterContainer = null;
-    
+    private Transform MonsterContainerTs { get { return mGameMgr.StageMgr.MonsterContainerTs; } }
+
+    private GameManager mGameMgr = null;
+
     private Dictionary<string, Queue<MonsterAI>> mMonsterDict = new Dictionary<string, Queue<MonsterAI>>();
 
     protected override void Awake()
     {
         base.Awake();
+
+        mGameMgr = GetComponent<GameManager>();
     }
 
     protected override void OnDestroy()
@@ -56,7 +59,7 @@ public class MonsterPools : MonoSingleTon<MonsterPools>
         var prefab = Resources.Load<GameObject>(path);
         var enemyGo = Instantiate(prefab) as GameObject;
         var enemyTs = enemyGo.transform;
-        enemyTs.SetParent(m_MonsterContainer);
+        enemyTs.SetParent(MonsterContainerTs);
 
         var monsterAI = enemyTs.GetComponent<MonsterAI>();
 
