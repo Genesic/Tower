@@ -23,4 +23,8 @@ public class TowerManager : MonoBehaviour {
 		}
 		gameObject.SetActive (false);
 	}
+
+	public void close_panel(){
+		gameObject.SetActive (false);
+	}
 }
