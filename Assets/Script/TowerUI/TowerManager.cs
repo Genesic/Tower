@@ -10,17 +10,18 @@ public class TowerManager : MonoBehaviour {
 	{
 		useCannon = selectCannon;
 	}
-
+	
 	public void build_tower(int selectTower)
 	{
 		Tower useTower = tower_list [selectTower -1];
-		Debug.Log (useCannon);
 		if (useCannon.IsEmpty) {
 			useCannon.BuildCannon (useTower);
 			Vector3 TowerPosition = useCannon.Position;
 			Quaternion TowerRotation = Quaternion.identity;
 			Instantiate (useTower, TowerPosition, TowerRotation);
 		}
+
+		// 關閉UI介面
 		gameObject.SetActive (false);
 	}
 
