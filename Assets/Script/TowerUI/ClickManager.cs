@@ -9,14 +9,14 @@ public class ClickManager : MonoBehaviour {
 	
 	void Update () {
 		if (Input.GetMouseButtonDown (0) ) {
-			ErrMessage.GetComponent<ErrMessage>().show_message("test!!");
+			//ErrMessage.GetComponent<ErrMessage>().show_message("test!!");
 			check_open_selectTwoerPannel(); // 檢查要不要開啟蓋塔UI
 		}
 	}
 
 	bool check_other_ui_panel(){
 		Vector2 check = Input.mousePosition;
-		Debug.Log (check);
+		//Debug.Log (check);
 		if (check.x > 833 && check.y > 456)
 			return false;
 
@@ -50,7 +50,7 @@ public class ClickManager : MonoBehaviour {
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		if( Physics.Raycast(ray, out hit, Mathf.Infinity, LayerMask.GetMask("CannonPlatform") ) ){
 			CannonPlatform selectCannon = hit.transform.gameObject.GetComponent<CannonPlatform>();
-			Debug.Log (selectCannon);
+			//Debug.Log (selectCannon);
 			if( selectCannon ){
 				selectTowerPannel.GetComponent<TowerManager>().set_useCannon(selectCannon);
 				openTowerPanel();

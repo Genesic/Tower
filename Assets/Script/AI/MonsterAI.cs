@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public abstract class MonsterAI : MonoBehaviour
@@ -9,6 +10,14 @@ public abstract class MonsterAI : MonoBehaviour
     public static readonly int ATTACK_HASH = Animator.StringToHash("attack");
     public static readonly int DANCE_HASH = Animator.StringToHash("dance");
     public static readonly int WALK_HASH = Animator.StringToHash("walk");
+
+	protected StatusManager m_statusManager;
+
+	[SerializeField]
+	protected int m_money;
+
+	[SerializeField]
+	protected int m_score;
 
     [SerializeField]
     protected float m_DetectInterval = 0.5f;
@@ -43,6 +52,8 @@ public abstract class MonsterAI : MonoBehaviour
 
         mAgent = GetComponent<NavMeshAgent>();
         mAni = GetComponentInChildren<Animator>();
+		GameObject mStatus = GameObject.Find("GameManager");
+		m_statusManager = mStatus.GetComponent<StatusManager> ();
     }
     
     protected virtual void OnDestroy()
@@ -173,6 +184,10 @@ public abstract class MonsterAI : MonoBehaviour
 
     protected void SetDeath()
     {
+		m_statusManager.updateKill (1);
+		m_statusManager.updateMoney (m_money);
+		m_statusManager.updateScore (m_score);
+
         StartCoroutine(DeathHandle());
     }
 
@@ -184,7 +199,7 @@ public abstract class MonsterAI : MonoBehaviour
         mAgent.enabled = false;
 
         yield return new WaitForSeconds(5f);
-
+		
         MonsterPools.Retrieve(this);
     }
 

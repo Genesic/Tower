@@ -39,7 +39,6 @@ public class Tower : MonoBehaviour, ICannon {
 				nextFire = Time.time + fireRate;
 				GameObject Bullet = (GameObject)Instantiate (shot, ShotSpwan, transform.rotation);
 				Vector3 direction = (LockCollider.gameObject.transform.position - ShotSpwan).normalized;
-				Debug.Log ("start: " + ShotSpwan + "target: "+ LockCollider.gameObject.transform.position + "direction: "+direction);
 				Bullet.GetComponent<Rigidbody> ().velocity = direction * speed;
 				LockCollider.gameObject.GetComponent<MonsterAI> ().Damage(damage);
 			}
