@@ -6,11 +6,13 @@ public class GameManager : MonoSingleTon<GameManager>
 {
     #region Field
 
-    public MapManager StageMgr { get; private set; }
+    public MapManager MapMgr { get; private set; }
 
     public EnemySpawnManager EnemySpawnMgr { get; private set; }
 
     public SoundManager SoundMgr { get; private set; }
+
+    public StatusManager StatusMgr { get; private set; }
 
     #endregion
 
@@ -40,16 +42,28 @@ public class GameManager : MonoSingleTon<GameManager>
 
     public void LevelLoadComplete(MapManager stageMgr)
     {
-        StageMgr = stageMgr;
+        MapMgr = stageMgr;
 
-        IninComponent();
+        InitComponent();
+
+        StartCoroutine(UpdateEnvironment());
     }
 
     /// <summary>初始化元件</summary>
-    private void IninComponent()
+    private void InitComponent()
     {
         EnemySpawnMgr = GetComponent<EnemySpawnManager>();
         SoundMgr = GetComponent<SoundManager>();
+        StatusMgr = GetComponent<StatusManager>();
+
+        gameObject.AddComponent<EffectManager>();
+    }
+
+    private IEnumerator UpdateEnvironment()
+    {
+        yield return new WaitForSeconds(1f);
+
+        DynamicGI.UpdateEnvironment();
     }
 
     #endregion

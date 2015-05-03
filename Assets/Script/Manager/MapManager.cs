@@ -7,6 +7,7 @@ public class MapManager : MonoBehaviour
     public Transform SpawnTs = null;
     public Transform TargetTs = null;
     public Transform MonsterContainerTs = null;
+    public Transform EffectContainerTs = null;
 
     void Awake()
     {

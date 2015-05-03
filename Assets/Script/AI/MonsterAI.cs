@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public abstract class MonsterAI : MonoBehaviour
+public abstract class MonsterAI : MonoBehaviour, IPool
 {
     public static readonly int IDLE_HASH = Animator.StringToHash("idle");
     public static readonly int SPAWN_HASH = Animator.StringToHash("spawn");
@@ -11,13 +11,15 @@ public abstract class MonsterAI : MonoBehaviour
     public static readonly int DANCE_HASH = Animator.StringToHash("dance");
     public static readonly int WALK_HASH = Animator.StringToHash("walk");
 
-	protected StatusManager m_statusManager;
+    protected string RebornEffect { get { return "MagicAuras/Prefabs/Shadow/GroundShadow"; } }
+    
+    protected StatusManager StatusMgr;
 
-	[SerializeField]
-	protected int m_money;
+    [SerializeField]
+    protected int m_money;
 
-	[SerializeField]
-	protected int m_score;
+    [SerializeField]
+    protected int m_score;
 
     [SerializeField]
     protected float m_DetectInterval = 0.5f;
@@ -31,7 +33,7 @@ public abstract class MonsterAI : MonoBehaviour
     [SerializeField]
     protected MonsterParam m_UseParam = null;
 
-    public string MonsterID { get { return m_MonsterID; } }
+    public string ID { get { return m_MonsterID; } }
 
     protected Transform mTs = null;
 
@@ -52,13 +54,13 @@ public abstract class MonsterAI : MonoBehaviour
 
         mAgent = GetComponent<NavMeshAgent>();
         mAni = GetComponentInChildren<Animator>();
-		GameObject mStatus = GameObject.Find("GameManager");
-		m_statusManager = mStatus.GetComponent<StatusManager> ();
+
+        StatusMgr = GameManager.Instance.StatusMgr;
     }
-    
+
     protected virtual void OnDestroy()
     {
-        
+
     }
 
     protected virtual void Update()
@@ -138,9 +140,9 @@ public abstract class MonsterAI : MonoBehaviour
     }
 
     public int getHp()
-	{
+    {
         return m_UseParam.HP;
-	}
+    }
 
     public void Damage(int damage)
     {
@@ -159,6 +161,10 @@ public abstract class MonsterAI : MonoBehaviour
     {
         StopDetect();
         SetAnimTrigger(MonsterAI.SPAWN_HASH);
+
+        yield return new WaitForSeconds(0.1f);
+
+        PlayEffect(RebornEffect, new Vector3(0f, 0.2f, 0f));
 
         yield return new WaitForSeconds(1f);
 
@@ -184,9 +190,9 @@ public abstract class MonsterAI : MonoBehaviour
 
     protected void SetDeath()
     {
-		m_statusManager.updateKill (1);
-		m_statusManager.updateMoney (m_money);
-		m_statusManager.updateScore (m_score);
+        //StatusMgr.updateKill(1);
+        //StatusMgr.updateMoney(m_money);
+        //StatusMgr.updateScore(m_score);
 
         StartCoroutine(DeathHandle());
     }
@@ -199,7 +205,7 @@ public abstract class MonsterAI : MonoBehaviour
         mAgent.enabled = false;
 
         yield return new WaitForSeconds(5f);
-		
+
         MonsterPools.Retrieve(this);
     }
 
@@ -230,6 +236,19 @@ public abstract class MonsterAI : MonoBehaviour
     protected void SetAnimBool(int hash, bool value)
     {
         mAni.SetBool(hash, value);
+    }
+
+    protected void PlayEffect(string id)
+    {
+        PlayEffect(id, Vector3.zero);
+    }
+
+    protected void PlayEffect(string id, Vector3 offset)
+    {
+        var setting = EffectManager.Instance.Obtain(id);
+        setting.SetPosition(mTs.position + offset);
+        setting.SetRotation(mTs.rotation);
+        setting.SetEnable();
     }
 
     [System.Serializable]

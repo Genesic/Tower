@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
 {
-    private Transform SpawnTs { get { return mGameMgr.StageMgr.SpawnTs; } }
+    private Transform SpawnTs { get { return mGameMgr.MapMgr.SpawnTs; } }
 
-    private Transform TargetTs { get { return mGameMgr.StageMgr.TargetTs; } }
+    private Transform TargetTs { get { return mGameMgr.MapMgr.TargetTs; } }
 
     [SerializeField]
     private Vector2 m_SpawnOffset = Vector2.zero;

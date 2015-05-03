@@ -2,6 +2,40 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public class MonsterPools : ObjectPools<MonsterPools, MonsterAI>
+{
+    protected override Transform ContainerTs { get { return mGameMgr.MapMgr.MonsterContainerTs; } }
+
+    protected override void Awake()
+    {
+        base.Awake();
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+    }
+
+    public static void Retrieve(MonsterAI obj)
+    {
+        Instance.InsRetrieve(obj);
+    }
+
+    public override MonsterAI CreateNew(string id)
+    {
+        var path = string.Format("Monster/{0}", id);
+        var prefab = Resources.Load<GameObject>(path);
+        var enemyGo = Instantiate(prefab) as GameObject;
+        var enemyTs = enemyGo.transform;
+        enemyTs.SetParent(ContainerTs);
+
+        var monsterAI = enemyTs.GetComponent<MonsterAI>();
+
+        return monsterAI;
+    }
+}
+
+/*
 public class MonsterPools : MonoSingleTon<MonsterPools>
 {
     private Transform MonsterContainerTs { get { return mGameMgr.StageMgr.MonsterContainerTs; } }
@@ -66,3 +100,4 @@ public class MonsterPools : MonoSingleTon<MonsterPools>
         return monsterAI;
     }
 }
+*/
