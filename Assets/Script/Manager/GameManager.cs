@@ -4,7 +4,17 @@ using System.Collections;
 /// <summary>遊戲管理類別</summary>
 public class GameManager : MonoSingleTon<GameManager>
 {
-    public MapManager StageMgr = null;
+    #region Field
+
+    public MapManager StageMgr { get; private set; }
+
+    public EnemySpawnManager EnemySpawnMgr { get; private set; }
+
+    public SoundManager SoundMgr { get; private set; }
+
+    #endregion
+
+    #region Unity Event
 
     protected override void Awake()
     {
@@ -18,6 +28,10 @@ public class GameManager : MonoSingleTon<GameManager>
         base.OnDestroy();
     }
 
+    #endregion
+
+    #region 初始化
+
     /// <summary>讀取場景</summary>
     private void LoadStage()
     {
@@ -27,5 +41,35 @@ public class GameManager : MonoSingleTon<GameManager>
     public void LevelLoadComplete(MapManager stageMgr)
     {
         StageMgr = stageMgr;
+
+        IninComponent();
     }
+
+    /// <summary>初始化元件</summary>
+    private void IninComponent()
+    {
+        EnemySpawnMgr = GetComponent<EnemySpawnManager>();
+        SoundMgr = GetComponent<SoundManager>();
+    }
+
+    #endregion
+
+    #region 測試用
+
+    void OnGUI()
+    {
+        if (GUILayout.Button("產生單隻怪物")) EnemySpawnMgr.SpawnEnemy();
+        if (GUILayout.Button("怪物腳本開始")) EnemySpawnMgr.StartSpawnEnemy();
+        if (GUILayout.Button("讓怪物全死亡")) EnemySpawnMgr.MonsterAllDie();
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space)) EnemySpawnMgr.SpawnEnemy();
+
+        if (Input.GetKeyDown(KeyCode.Alpha1)) DynamicGI.UpdateEnvironment();
+    }
+
+    #endregion
+
 }

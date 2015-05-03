@@ -41,7 +41,7 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
         base.OnDestroy();
     }
 
-    private void StartSpawnEnemy()
+    public void StartSpawnEnemy()
     {
         mSpwanCoroutine = StartCoroutine(CoStartSpawnEnemy());
     }
@@ -64,7 +64,7 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
             SpawnEnemy();
     }
 
-    private void SpawnEnemy()
+    public void SpawnEnemy()
     {
         var monsterAI = m_MonsterPools.Obtain("tufu");
         monsterAI.SetPosition(GetSpawnPosition());
@@ -84,51 +84,20 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
         }
     }
 
-    /*private void CreateEnemy()
-    {
-        var prefab = Resources.Load<GameObject>("Monster/tufu");
-        var enemyGo = Instantiate(prefab) as GameObject;
-        var enemyTs = enemyGo.transform;
-        enemyTs.SetParent(m_MonsterTs);
-        enemyTs.position = GetSpawnPosition();
-        enemyTs.rotation = m_SpawnTs.rotation;
-
-        var monsterAI = enemyTs.GetComponent<MonsterAI>();
-        monsterAI.SetTarget(m_TargetTs);
-
-        mAliveMonsterQueue.Enqueue(monsterAI);
-    }*/
-    
     private Vector3 GetSpawnPosition()
     {
         var origin = SpawnTs.position;
-        var pos = SpawnTs.rotation * new Vector3(Random.Range(-m_SpawnOffset.x, m_SpawnOffset.x), 0f, Random.Range(-m_SpawnOffset.y, m_SpawnOffset.y));
+        var randomPos = SpawnTs.rotation * new Vector3(Random.Range(-m_SpawnOffset.x, m_SpawnOffset.x), 0f, Random.Range(-m_SpawnOffset.y, m_SpawnOffset.y));
 
-        return origin + pos;
+        return origin + randomPos;
     }
 
-    private void MonsterAllDie()
+    public void MonsterAllDie()
     {
         while (mAliveMonsterQueue.Count > 0)
         {
             MonsterAI monster = mAliveMonsterQueue.Dequeue();
             monster.Damage(999999);
-        }
-    }
-
-    void OnGUI()
-    {
-        if (GUILayout.Button("CreateEnemy")) SpawnEnemy();
-        if (GUILayout.Button("StartSpawnEnemy")) StartSpawnEnemy();
-        if (GUILayout.Button("MonsterAllDie")) MonsterAllDie();
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space)) SpawnEnemy();
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            DynamicGI.UpdateEnvironment();
         }
     }
 }
