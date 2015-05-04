@@ -37,24 +37,27 @@ public class MouseMove : MonoBehaviour {
 		}
 		
 		// Get the middle mouse button
-		if(Input.GetMouseButtonDown(2))
-		{
+//		if(Input.GetAxis("Mouse ScrollWheel") > 0 || Input.GetAxis("Mouse ScrollWheel") < 0)
+//		{
 			// Get mouse origin
 //			mouseOrigin = Input.mousePosition;
-//			isRotating = true;
-		}
+//			isZooming = true;
+//		}
 		
 		// Disable movements on button release
-		if (!Input.GetMouseButton(0)) isPanning=false;
-		if (!Input.GetMouseButton(1)) isRotating=false;
-		if (!Input.GetMouseButton(2)) isZooming=false;
+		if (!Input.GetMouseButton(0)) 
+			isPanning=false;
+		if (!Input.GetMouseButton(1)) 
+			isRotating=false;
+//		if (!(Input.GetAxis("Mouse ScrollWheel") > 0) || !(Input.GetAxis("Mouse ScrollWheel") < 0)) 
+//			isZooming=false;
 		
 		// Move the camera on it's XY plane
 		if (isPanning)
 		{
 			Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - mouseOrigin);
 
-			Vector3 move = new Vector3(pos.x * panSpeed, 0, pos.y * panSpeed);
+			Vector3 move = new Vector3(- pos.x * panSpeed, 0, - pos.y * panSpeed);
 			transform.Translate(move);
 		}
 
@@ -63,18 +66,34 @@ public class MouseMove : MonoBehaviour {
 		{
 			Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - mouseOrigin);
 
-			transform.RotateAround(transform.position, transform.right, -pos.y * turnSpeed);
+//			transform.RotateAround(transform.position, transform.right, -pos.y * turnSpeed);
 			transform.RotateAround(transform.position, Vector3.up, -pos.x * turnSpeed);
 		}
+	}
 
-		// Move the camera linearly along Z axis
-//		if (isZooming)
-//		{
-//			Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - mouseOrigin);
-//			
-//			Vector3 move = pos.y * zoomSpeed * transform.forward; 
-//			transform.Translate(move, Space.World);
-//		}
+	void LateUpdate()
+	{
+		//Input.GetAxis("Mouse ScrollWheel") < 0 表示滾輪向前滾動
+		if (Input.GetAxis ("Mouse ScrollWheel") < 0) 
+		{
+			float _height = transform.position.y;
+			_height = _height + zoomSpeed;
 
+			if (_height > 40)
+				transform.position = new Vector3(transform.position.x, 40, transform.position.z);
+			else
+				transform.position = new Vector3(transform.position.x, _height, transform.position.z);
+		}
+
+		if (Input.GetAxis ("Mouse ScrollWheel") > 0) 
+		{
+			float _height = transform.position.y;
+			_height = _height - zoomSpeed;
+			
+			if (_height < 10)
+				transform.position = new Vector3(transform.position.x, 10, transform.position.z);
+			else
+				transform.position = new Vector3(transform.position.x, _height, transform.position.z);
+		}
 	}
 }
