@@ -30,7 +30,9 @@ public class TowerManager : MonoBehaviour {
 			return;
 		}
 
-		int cost = useTower.cost;
+		int cost = useTower.Cost;
+		Debug.Log (cost);
+		Debug.Log (statusManager);
 		if (!statusManager.updateMoney (-cost)) {
 			ErrMessage.GetComponent<ErrMessage> ().show_message ("Need More Money!!");
 			gameObject.SetActive (false);

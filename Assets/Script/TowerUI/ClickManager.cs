@@ -5,6 +5,7 @@ using System.Collections;
 public class ClickManager : MonoBehaviour {
 
 	public GameObject selectTowerPannel;
+	public GameObject TowerStatusPannel;
 	public Text ErrMessage;
 	
 	void Update () {
@@ -28,7 +29,7 @@ public class ClickManager : MonoBehaviour {
 
 	void check_open_selectTwoerPannel(){
 		if (check_other_ui_panel ()) { // 檢查有沒有點到其他UI
-			if (!selectTowerPannel.activeSelf) {
+			if ( !anyPanelOpen() ) {
 				check_raycast_to_open_panel ();
 			} else {  
 				float offset_x = 70;
@@ -39,6 +40,7 @@ public class ClickManager : MonoBehaviour {
 				if ((check.x > start.x && check.x < end.x) && (check.y > end.y || check.y < start.y)) {
 					// do nothing
 				} else {
+					Debug.Log ("check:"+check+" end:"+end);
 					check_raycast_to_open_panel ();
 				}
 			}
@@ -52,13 +54,16 @@ public class ClickManager : MonoBehaviour {
 			CannonPlatform selectCannon = hit.transform.gameObject.GetComponent<CannonPlatform>();
 			//Debug.Log (selectCannon);
 			if( selectCannon ){
-				selectTowerPannel.GetComponent<TowerManager>().set_useCannon(selectCannon);
-				openTowerPanel();
+				if( selectCannon.IsEmpty ){
+					openBuildTowerPanel(selectCannon);
+				} else {
+					openTowerStatusPanel(selectCannon);
+				}
 			}
 		}
 	}
 
-	void openTowerPanel (){
+	Vector3 getPanelPosition(){
 		Vector3 newPosition = Input.mousePosition;
 		newPosition.x += 64.0F;
 		newPosition.y -= 110.0F;
@@ -69,7 +74,40 @@ public class ClickManager : MonoBehaviour {
 		if( newPosition.y < 120 ){
 			newPosition.y += 220.0F;
 		}
+
+		return newPosition;
+	}
+
+	bool anyPanelOpen (){
+		if (selectTowerPannel.activeSelf)
+			return true;
+
+		if (TowerStatusPannel.activeSelf)  
+			return true;
+
+		return false;
+	}
+
+	void closeAllPanel() {
+		selectTowerPannel.SetActive(false);
+		TowerStatusPannel.SetActive(false);
+	}
+
+	void openTowerStatusPanel (CannonPlatform selectCannon){
+		closeAllPanel ();
+		TowerStatusPannel.GetComponent<TowerStatusManager>().set_useCannon(selectCannon);
+		Vector3 newPosition = getPanelPosition();
+		TowerStatusPannel.transform.position = newPosition;
+		TowerStatusPannel.SetActive(true);
+	}
+
+
+	void openBuildTowerPanel (CannonPlatform selectCannon){
+		closeAllPanel ();
+		selectTowerPannel.GetComponent<TowerManager>().set_useCannon(selectCannon);
+		Vector3 newPosition = getPanelPosition();
 		selectTowerPannel.transform.position = newPosition;
 		selectTowerPannel.SetActive(true);
+
 	}
 }

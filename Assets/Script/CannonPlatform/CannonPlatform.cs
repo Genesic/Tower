@@ -17,6 +17,12 @@ public class CannonPlatform : MonoBehaviour
 
     public string ID { get { return name; } }
 
+	public int getLevel { get{ return mCannon.Level; } }
+	public string getName { get{ return mCannon.towerName; } }
+	public int getAtk { get{ return mCannon.Damage; } }
+	public float getSpd { get{ return mCannon.Speed; } }
+	public int getPrice { get{ return mCannon.Price; } }
+
     void Awake()
     {
         mTs = transform;
@@ -33,6 +39,7 @@ public class CannonPlatform : MonoBehaviour
 
         mCannon = cannon;
     }
+
 
     /// <summary>賣掉砲塔</summary>
     public void SellCannon()
