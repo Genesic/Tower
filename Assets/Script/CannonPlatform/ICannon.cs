@@ -9,4 +9,5 @@ public interface ICannon
 	int Damage { get; }
 	int Level { get; }
 	string towerName { get; }
+	void destroy();
 }

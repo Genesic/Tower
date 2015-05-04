@@ -51,4 +51,8 @@ public class Tower : MonoBehaviour, ICannon {
 			}
 		}
 	}
+
+	public void destroy(){
+		Destroy (gameObject);
+	}
 }

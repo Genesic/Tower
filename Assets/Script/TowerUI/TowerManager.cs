@@ -24,25 +24,13 @@ public class TowerManager : MonoBehaviour {
 	{
 		Tower useTower = tower_list [selectTower -1];
 
-		if (!useCannon.IsEmpty) {
-			ErrMessage.GetComponent<ErrMessage> ().show_message ("Here Already Build Tower!!");
-			gameObject.SetActive (false);
-			return;
+		if( useCannon.checkBuildCannon(useTower) )
+		{
+			Vector3 TowerPosition = useCannon.Position;
+			Quaternion TowerRotation = Quaternion.identity;
+			Tower buildTower = Instantiate (useTower, TowerPosition, TowerRotation) as Tower;
+			useCannon.BuildCannon (buildTower);
 		}
-
-		int cost = useTower.Cost;
-		Debug.Log (cost);
-		Debug.Log (statusManager);
-		if (!statusManager.updateMoney (-cost)) {
-			ErrMessage.GetComponent<ErrMessage> ().show_message ("Need More Money!!");
-			gameObject.SetActive (false);
-			return;
-		}
-				
-		useCannon.BuildCannon (useTower);
-		Vector3 TowerPosition = useCannon.Position;
-		Quaternion TowerRotation = Quaternion.identity;
-		Instantiate (useTower, TowerPosition, TowerRotation);
 
 		// 關閉UI介面
 		gameObject.SetActive (false);

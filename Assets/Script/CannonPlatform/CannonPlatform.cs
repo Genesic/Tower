@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 /// <summary>砲台管理類別</summary>
@@ -17,6 +18,9 @@ public class CannonPlatform : MonoBehaviour
 
     public string ID { get { return name; } }
 
+	private StatusManager statusManager;
+	private ErrMessage errMsg;
+
 	public int getLevel { get{ return mCannon.Level; } }
 	public string getName { get{ return mCannon.towerName; } }
 	public int getAtk { get{ return mCannon.Damage; } }
@@ -26,18 +30,42 @@ public class CannonPlatform : MonoBehaviour
     void Awake()
     {
         mTs = transform;
-    }
 
-    /// <summary>建置砲塔</summary>
+		GameObject Status = GameObject.Find("GameManager");
+		statusManager = Status.GetComponent<StatusManager> ();
+
+		GameObject ErrMsg = GameObject.FindGameObjectWithTag ("ErrMsg");
+		Debug.Log ("ErrMsg : " + ErrMsg);
+		if( ErrMsg )
+			errMsg = ErrMsg.GetComponent<ErrMessage> ();
+	}
+	/// <summary>檢查可否建置砲塔</summary>
+	public bool checkBuildCannon(ICannon cannon)
+	{
+		if (HasCannon)
+		{
+			errMsg.show_message ("Here Already Build Tower!!");
+			Debug.LogErrorFormat("位置:{0} 已放置砲塔:{1}", name, ID);
+			return false;
+		}
+		
+		int cost = cannon.Cost;
+		if ( statusManager.getMoney < cost ) {
+			errMsg.show_message ("Need More Money!!");
+			return false;
+		}
+
+		return true;
+	}	
+	
+	/// <summary>建置砲塔</summary>
     public void BuildCannon(ICannon cannon)
     {
-        if (HasCannon)
-        {
-            Debug.LogErrorFormat("位置:{0} 已放置砲塔:{1}", name, ID);
-            return;
-        }
-
-        mCannon = cannon;
+		if ( checkBuildCannon (cannon) ) {
+			int cost = cannon.Cost;
+			statusManager.updateMoney(-cost);
+			mCannon = cannon;
+		}
     }
 
 
@@ -50,6 +78,9 @@ public class CannonPlatform : MonoBehaviour
             return;
         }
 
+		int price = mCannon.Price;
+		statusManager.updateMoney(price);
+		mCannon.destroy();
         mCannon = null;
     }
 }

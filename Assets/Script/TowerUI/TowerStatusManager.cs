@@ -21,12 +21,20 @@ public class TowerStatusManager : MonoBehaviour {
 	public void set_useCannon(CannonPlatform selectCannon)
 	{
 		useCannon = selectCannon;
-		Debug.Log (useCannon);
 		lvText.text = " Lv : " + useCannon.getLevel;
 		towertypeText.text = useCannon.getName;
 		atkText.text = " ATK : " + useCannon.getAtk;
 		spdText.text = " SPD : " + useCannon.getSpd;
 		priceText.text = " Sell : " + useCannon.getPrice + "G";
+	}
+
+	public void sell_tower(){
+		if (useCannon.IsEmpty)
+			return;
+
+		useCannon.SellCannon();
+		close_panel ();
+
 	}
 
 	public void close_panel(){

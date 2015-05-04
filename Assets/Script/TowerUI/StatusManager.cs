@@ -19,6 +19,8 @@ public class StatusManager : MonoBehaviour {
 		updateMoney (0);
 	}
 
+	public int getMoney { get {return money;} }
+
 	public void updateKill(int patch){
 		kill += patch;
 		killText.text = "擊殺數量 : " + kill;
