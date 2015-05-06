@@ -35,7 +35,6 @@ public class CannonPlatform : MonoBehaviour
 		statusManager = Status.GetComponent<StatusManager> ();
 
 		GameObject ErrMsg = GameObject.FindGameObjectWithTag ("ErrMsg");
-		Debug.Log ("ErrMsg : " + ErrMsg);
 		if( ErrMsg )
 			errMsg = ErrMsg.GetComponent<ErrMessage> ();
 	}
