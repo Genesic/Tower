@@ -26,16 +26,7 @@ public class Tower : MonoBehaviour, ICannon {
 	public string towerName { get { return tower_name; } }
 
 	private MonsterAI lockMonster;
-	private Transform child_rotate;
-
-	void Awake(){
-		Transform[] allChildren = GetComponentsInChildren<Transform>();
-		foreach (Transform child in allChildren) {
-			if( child.tag == "tower_rotate" ){
-				child_rotate = child;
-			}
-		}
-	}
+	public Transform child_rotate;
 
 	// Update is called once per frame
 	void Update () {
