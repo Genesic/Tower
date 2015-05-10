@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MouseMove : MonoBehaviour {
+public class CameraMove : MonoBehaviour {
 
 	public float turnSpeed = 4.0f;		// Speed of camera turning when mouse moves in along an axis
 	public float panSpeed = 4.0f;		// Speed of the camera when being panned
