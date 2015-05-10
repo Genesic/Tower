@@ -21,6 +21,7 @@ public class MouseMove : MonoBehaviour {
 		panSpeed = 4.0f;		// Speed of the camera when being panned
 		zoomSpeed = 4.0f;		// Speed of the camera going back and forth
 		keyboardMoveSpeed = 0.5f;
+		keyboardTurnSpeed = 2.0f;
 	}
 
 	// Update is called once per frame
@@ -51,9 +52,13 @@ public class MouseMove : MonoBehaviour {
 		// Move the camera on it's XY plane
 		if (isPanning)
 		{
+			Vector3 beforeMovePos = transform.position;
 			Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - mouseOrigin);
 			Vector3 move = new Vector3(- pos.x * panSpeed, 0, - pos.y * panSpeed);
 			transform.Translate(move);
+
+			if (transform.position.x < -10 || transform.position.x > 85 || transform.position.z > 60 || transform.position.z < -40)
+				transform.position = beforeMovePos;
 		}
 
 		// Rotate camera along X and Y axis
@@ -67,23 +72,39 @@ public class MouseMove : MonoBehaviour {
 		//	--move--
 		if (Input.GetKey(KeyCode.W))
 		{
+			Vector3 beforeMovePos = transform.position;
 			Vector3 move = new Vector3(0, 0, keyboardMoveSpeed);
 			transform.Translate(move);
+
+			if (transform.position.x < -10 || transform.position.x > 85 || transform.position.z > 60 || transform.position.z < -40)
+				transform.position = beforeMovePos;
 		}
 		if (Input.GetKey(KeyCode.S))
 		{
+			Vector3 beforeMovePos = transform.position;
 			Vector3 move = new Vector3(0, 0, -keyboardMoveSpeed);
 			transform.Translate(move);
+
+			if (transform.position.x < -10 || transform.position.x > 85 || transform.position.z > 60 || transform.position.z < -40)
+				transform.position = beforeMovePos;
 		}
 		if (Input.GetKey(KeyCode.A))
 		{
+			Vector3 beforeMovePos = transform.position;
 			Vector3 move = new Vector3(-keyboardMoveSpeed, 0, 0);
 			transform.Translate(move);
+
+			if (transform.position.x < -10 || transform.position.x > 85 || transform.position.z > 60 || transform.position.z < -40)
+				transform.position = beforeMovePos;
 		}
 		if (Input.GetKey(KeyCode.D))
 		{
+			Vector3 beforeMovePos = transform.position;
 			Vector3 move = new Vector3(keyboardMoveSpeed, 0, 0);
 			transform.Translate(move);
+
+			if (transform.position.x < -10 || transform.position.x > 85 || transform.position.z > 60 || transform.position.z < -40)
+				transform.position = beforeMovePos;
 		}
 
 		//	--Rotate--
