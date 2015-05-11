@@ -67,19 +67,27 @@ public class Tower : MonoBehaviour, ICannon {
 				Bullet.SetEnable();
 				Vector3 direction = (LockCollider.gameObject.transform.position - child_rotate.position).normalized;
 				Bullet.SetVelocity(direction, speed);
-				LockCollider.gameObject.GetComponent<MonsterAI>().Damage(damage);
+				Bullet.SetDamage(damage);
+				//LockCollider.gameObject.GetComponent<MonsterAI>().Damage(damage);
 			}
 		}
 	}
 
 	void FixedUpdate() {
-		if (lockMonster) {
-			Vector3 targetDir = lockMonster.transform.position - child_rotate.transform.position;
-			Vector3 newDir = Vector3.RotateTowards( child_rotate.transform.forward, targetDir, 0.05F, 0.0F );				
-			child_rotate.transform.rotation = Quaternion.LookRotation(newDir);
+		if (!lockMonster)
+			return;
+		if (lockMonster.getHp () <= 0)
+			return;
 
-			ShotSpwan = child_rotate.position + new Vector3(0.0F,0.5f, 0.0F );
-		}
+		if (Vector3.Distance (lockMonster.transform.position, transform.position) > searchRadius)
+			return;
+
+		Vector3 targetDir = lockMonster.transform.position - child_rotate.transform.position;
+		Vector3 newDir = Vector3.RotateTowards( child_rotate.transform.forward, targetDir, 0.05F, 0.0F );				
+		child_rotate.transform.rotation = Quaternion.LookRotation(newDir);
+
+		ShotSpwan = child_rotate.position + new Vector3(0.0F,0.5f, 0.0F );
+		
 	}
 
 	public void destroy(){

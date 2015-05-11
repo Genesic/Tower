@@ -42,11 +42,8 @@ public abstract class ObjectPools<T1, T2> : MonoSingleTon<T1>
         Queue<T2> queue;
 
         if (mDepotDict.TryGetValue (id, out queue)) {
-			Debug.Log ("id:" + id + " queue count:" + queue.Count);
 			if (queue.Count > 0)
 				return queue.Dequeue ();
-		} else {
-			Debug.Log ("else id:" + id + " mDepotDict " + mDepotDict);
 		}
 
         return CreateNew(id);

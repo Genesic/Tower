@@ -5,6 +5,8 @@ public class BulletSetting : IPool
 {
     public GameObject explosion;
 
+	private int damage;
+
     private Transform mTs = null;
 
     void Awake()
@@ -37,12 +39,20 @@ public class BulletSetting : IPool
         explosion = explosion_prefab;
     }
 
+	public void SetDamage(int value){
+		damage = value;
+	}
+
     void OnTriggerEnter(Collider other)
     {
         //if (other.gameObject.layer == LayerMask.NameToLayer ("Monster")) {
         Instantiate(explosion, transform.position, transform.rotation);
         SetDisable();
         BulletManager.Retrieve(this);
+
+		if (other.gameObject.layer == LayerMask.NameToLayer ("Monster")) {
+			other.gameObject.GetComponent<MonsterAI> ().Damage (damage);
+		}
         //} else {
         //	Debug.Log ("trigger:"+other.gameObject);
         //}
