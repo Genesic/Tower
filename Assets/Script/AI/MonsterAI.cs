@@ -161,8 +161,7 @@ public abstract class MonsterAI : IPool
     protected void SetMonsterAction(MonsterAction monsterAction)
     {
         mMonsterAction = monsterAction;
-
-        Debug.LogFormat("SetMonsterAction:{0}", mMonsterAction);
+        //Debug.LogFormat("SetMonsterAction:{0}", mMonsterAction);
     }
 
     protected void FollowStart()
@@ -274,7 +273,7 @@ public abstract class MonsterAI : IPool
 
             yield return new WaitForSeconds(1.5f);
 
-            Debug.Log("Call CoreBase");
+            //Debug.Log("Call CoreBase");
         }
     }
     
@@ -411,73 +410,3 @@ public abstract class MonsterAI : IPool
         Gizmos.DrawWireSphere(mAttackPoint, 1f);
     }
 }
-
-
-/*private IEnumerator UpdateRemain()
-{
-    while (true)
-    {
-        RemainDistance = GetRemain();
-        yield return new WaitForSeconds(1f);
-    }
-}*/
-
-
-/*protected void WalkUpdate()
-{
-    bool isWalk = !mAgent.velocity.normalized.Equals(Vector3.zero);
-
-    SetAnimBool(MonsterAI.WALK_HASH, isWalk);
-}*/
-
-/*protected void StopDetect()
-{
-    if (mDetectCoroutine != null)
-    {
-        StopCoroutine(mDetectCoroutine);
-        mDetectCoroutine = null;
-
-        mAgent.Stop();
-    }
-}*/
-
-/*protected void StartDetect()
-{
-    StopDetect();
-
-    StartCoroutine(Loop());
-    //mDetectCoroutine = StartCoroutine(LoopDetect());
-}*/
-
-/*protected IEnumerator LoopDetect()
-{
-    //while (true)
-    //{
-    //    Follow();
-    //    yield return new WaitForSeconds(m_DetectInterval);
-    //}
-
-    Follow();
-    //
-    while (true)
-    {
-
-
-        Debug.LogFormat("{0}<={1}", GetRemain(), mAgent.stoppingDistance);
-        yield return null;
-    }
-
-    //yield return null;
-
-    //while (mAgent.pathStatus != NavMeshPathStatus.PathComplete)
-    //{
-    //    Debug.Log("pathStatus:" + mAgent.pathStatus);
-    //    yield return null;
-    //    //yield return new WaitForSeconds(m_DetectInterval);
-    //}
-
-    //while (mAgent.pathPending)
-    //{
-    //    yield return null;
-    //}
-}*/
