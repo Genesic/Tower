@@ -30,7 +30,6 @@ public class SoundManager : MonoBehaviour
 
     private IEnumerator CoPlaySound()
     {
-        Debug.Log(mIndex);
         m_AudioSource.clip = m_AudioClips[mIndex];
         //m_AudioSource.time = 95f;
         m_AudioSource.Play();

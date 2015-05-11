@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BulletSetting : MonoBehaviour, IPool {
+public class BulletSetting : IPool
+{
 
-	private string mID = string.Empty;
-	public string ID { get { return mID; } }
+    //private string mID = string.Empty;
+    //public string ID { get { return mID; } }
+
 	public GameObject explosion;
 
 	private Transform mTs = null;
@@ -14,10 +16,10 @@ public class BulletSetting : MonoBehaviour, IPool {
 		mTs = transform;
 	}
 
-	public void SetDisable()
+	/*public void SetDisable()
 	{
 		gameObject.SetActive(false);
-	}
+	}*/
 	
 	public void SetParam(string id)
 	{
@@ -34,10 +36,10 @@ public class BulletSetting : MonoBehaviour, IPool {
 		mTs.rotation = rotation;
 	}
 	
-	public void SetEnable()
+	/*public void SetEnable()
 	{
 		gameObject.SetActive(true);
-	}
+	}*/
 
 	public void SetVelocity( Vector3 direction, float speed)
 	{
