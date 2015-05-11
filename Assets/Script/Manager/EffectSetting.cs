@@ -1,21 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EffectSetting : MonoBehaviour, IPool
+public class EffectSetting : IPool
 {
-    private string mID = string.Empty;
+    /*private string mID = string.Empty;
     public string ID { get { return mID; } }
-
+    */
     private Transform mTs = null;
 
     void Awake()
     {
         mTs = transform;
-    }
-
-    public void SetDisable()
-    {
-        gameObject.SetActive(false);
     }
 
     public void SetParam(string id)
@@ -33,9 +28,9 @@ public class EffectSetting : MonoBehaviour, IPool
         mTs.rotation = rotation;
     }
 
-    public void SetEnable()
+    public override void SetEnable()
     {
-        gameObject.SetActive(true);
+        base.SetEnable();
 
         StartCoroutine(CalculateLifePeriod());
     }

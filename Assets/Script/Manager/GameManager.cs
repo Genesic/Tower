@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
+using DaikonForge.Tween;
+using DaikonForge.Tween.Interpolation;
 
 /// <summary>遊戲管理類別</summary>
 public class GameManager : MonoSingleTon<GameManager>
@@ -14,6 +17,26 @@ public class GameManager : MonoSingleTon<GameManager>
 
     public StatusManager StatusMgr { get; private set; }
 
+    [SerializeField]
+    private Canvas m_UICanvas = null;
+    public Canvas UICanvas
+    {
+        get
+        {
+            if (m_UICanvas == null)
+                m_UICanvas = GameObject.FindObjectOfType<Canvas>();
+            return m_UICanvas;
+        }
+    }
+    
+    public Transform MoveCamTs { get; private set; }
+
+    public Transform MainCamTs { get; private set; }
+
+    private TweenGroup mCameraTween = null;
+    private Tween<Vector3> mMoveCamTweenPos = null;
+    private Tween<Vector3> mMoveCamTweenRot = null;
+
     #endregion
 
     #region Unity Event
@@ -21,6 +44,9 @@ public class GameManager : MonoSingleTon<GameManager>
     protected override void Awake()
     {
         base.Awake();
+
+        MoveCamTs = GameObject.Find("MoveCamera").transform;
+        MainCamTs = MoveCamTs.GetComponentInChildren<Camera>().transform;
 
         LoadStage();
     }
@@ -40,11 +66,12 @@ public class GameManager : MonoSingleTon<GameManager>
         SceneManager.LoadStage(1);
     }
 
-    public void LevelLoadComplete(MapManager stageMgr)
+    public void LevelLoadComplete(MapManager mapMgr)
     {
-        MapMgr = stageMgr;
+        MapMgr = mapMgr;
 
         InitComponent();
+        InitCameraTween();
 
         StartCoroutine(UpdateEnvironment());
     }
@@ -57,6 +84,8 @@ public class GameManager : MonoSingleTon<GameManager>
         StatusMgr = GetComponent<StatusManager>();
 
         gameObject.AddComponent<EffectManager>();
+        gameObject.AddComponent<HUDManager>();
+        MapMgr.gameObject.AddComponent<CoreBase>();
     }
 
     private IEnumerator UpdateEnvironment()
@@ -64,6 +93,61 @@ public class GameManager : MonoSingleTon<GameManager>
         yield return new WaitForSeconds(1f);
 
         DynamicGI.UpdateEnvironment();
+    }
+
+    #endregion
+
+    #region 特寫最接近保壘的怪相關處裡
+
+    private void InitCameraTween()
+    {
+        float duration = 0.5f;
+
+        mMoveCamTweenPos = Tween<Vector3>.Obtain()
+        .SetDuration(duration)
+        .OnExecute(pos =>
+        {
+            MoveCamTs.position = pos;
+        });
+
+        mMoveCamTweenRot = Tween<Vector3>.Obtain()
+        .SetDuration(duration)
+        .OnExecute(forward =>
+        {
+            MoveCamTs.forward = forward;
+        });
+
+        mCameraTween = new TweenGroup();
+        mCameraTween.SetMode(TweenGroupMode.Concurrent);
+        mCameraTween.AppendTween(mMoveCamTweenPos, mMoveCamTweenRot);
+    }
+
+    public void LookAtNearestMonster()
+    {
+        var monster = EnemySpawnMgr.GetCloseToBaseMonster();
+        if (monster == null)
+        {
+            return;
+        }
+
+        var monsterTs = monster.transform;
+        var monsterPos = monsterTs.position;
+        var monsterRot = monsterTs.rotation;
+
+        Quaternion rot = monsterRot * Quaternion.AngleAxis(30f, Vector3.left);
+
+        Vector3 camPos = monsterPos + rot * Vector3.forward * 10f;
+
+        Vector3 camToMonster = (monsterPos - camPos).normalized;
+        camToMonster.y = 0f;
+
+        mMoveCamTweenPos.OnSyncStartValue(() => MoveCamTs.position);
+        mMoveCamTweenPos.OnSyncEndValue(() => camPos);
+
+        mMoveCamTweenRot.OnSyncStartValue(() => MoveCamTs.forward);
+        mMoveCamTweenRot.OnSyncEndValue(() => camToMonster);
+        
+        mCameraTween.Play();
     }
 
     #endregion
@@ -79,10 +163,16 @@ public class GameManager : MonoSingleTon<GameManager>
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) EnemySpawnMgr.SpawnEnemy();
+        if (Input.GetKeyDown(KeyCode.Space)) LookAtNearestMonster();
 
-        if (Input.GetKeyDown(KeyCode.Alpha1)) DynamicGI.UpdateEnvironment();
+        if (Input.GetKeyDown(KeyCode.Alpha1)) EnemySpawnMgr.SpawnEnemy();
     }
+
+    //void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.green;
+    //    Gizmos.DrawWireSphere(mTestPos, 1f);
+    //}
 
     #endregion
 

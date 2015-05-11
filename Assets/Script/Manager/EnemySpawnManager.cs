@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
 {
@@ -75,6 +76,29 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
         mAliveMonsterQueue.Enqueue(monsterAI);
     }
 
+    /// <summary>取得最接近總部塔的怪物</summary>
+    public MonsterAI GetCloseToBaseMonster()
+    {
+        Debug.Log("Count:" + mAliveMonsterQueue.Count);
+
+        List<MonsterPathData> list = new List<MonsterPathData>();
+
+        foreach (var monster in mAliveMonsterQueue)
+        {
+            list.Add(new MonsterPathData { Monster = monster, RemainDistance = monster.RemainDistance });
+        }
+
+        var result = list.OrderBy(data => data.RemainDistance);
+
+        var nearest = result.FirstOrDefault();
+        if (nearest != null)
+        {
+            return nearest.Monster;
+        }
+
+        return null;
+    }
+
     private void StopSpawnEnemy()
     {
         if (mSpwanCoroutine != null)
@@ -99,5 +123,11 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
             MonsterAI monster = mAliveMonsterQueue.Dequeue();
             monster.Damage(999999);
         }
+    }
+
+    public class MonsterPathData
+    {
+        public MonsterAI Monster = null;
+        public float RemainDistance = 0f;
     }
 }

@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
-
-public abstract class MonsterAI : MonoBehaviour, IPool
+using System.Collections.Generic;
+public abstract class MonsterAI : IPool
 {
     public static readonly int IDLE_HASH = Animator.StringToHash("idle");
     public static readonly int SPAWN_HASH = Animator.StringToHash("spawn");
@@ -12,7 +12,10 @@ public abstract class MonsterAI : MonoBehaviour, IPool
     public static readonly int WALK_HASH = Animator.StringToHash("walk");
 
     protected string RebornEffect { get { return "MagicAuras/Prefabs/Shadow/GroundShadow"; } }
-    
+    protected bool IsAlive { get { return m_UseParam.HP > 0; } }
+    protected bool IsDeath { get { return !IsAlive; } }
+    public float RemainDistance { get; private set; }
+
     protected StatusManager StatusMgr;
 
     [SerializeField]
@@ -33,8 +36,6 @@ public abstract class MonsterAI : MonoBehaviour, IPool
     [SerializeField]
     protected MonsterParam m_UseParam = null;
 
-    public string ID { get { return m_MonsterID; } }
-
     protected Transform mTs = null;
 
     protected Transform mTargetTs = null;
@@ -43,19 +44,31 @@ public abstract class MonsterAI : MonoBehaviour, IPool
 
     protected NavMeshAgent mAgent = null;
 
-    private Coroutine mDetectCoroutine = null;
+    private Coroutine mLoopCoroutine = null;
+    //private Coroutine mActionCoroutine = null;
 
-    protected bool IsAlive { get { return m_UseParam.HP > 0; } }
-    protected bool IsDeath { get { return !IsAlive; } }
+    private MonsterHUD mMonsterHUD = null;
+    
+    private MonsterAction mMonsterAction = MonsterAction.Idle;
+    private Dictionary<MonsterAction, System.Func<IEnumerator>> mMonsterActionDict = new Dictionary<MonsterAction, System.Func<IEnumerator>>();
 
     protected virtual void Awake()
     {
         mTs = transform;
 
+        mID = m_MonsterID;
+
         mAgent = GetComponent<NavMeshAgent>();
         mAni = GetComponentInChildren<Animator>();
 
         StatusMgr = GameManager.Instance.StatusMgr;
+
+        mMonsterActionDict.Add(MonsterAction.Spawn, SpawnHandle);
+        mMonsterActionDict.Add(MonsterAction.Idle, IdleHandle);
+        mMonsterActionDict.Add(MonsterAction.Attack, AttackHandle);
+        mMonsterActionDict.Add(MonsterAction.Move, MoveHandle);
+        mMonsterActionDict.Add(MonsterAction.Death, DeathHandle);
+        mMonsterActionDict.Add(MonsterAction.Dance, DanceHandle);
     }
 
     protected virtual void OnDestroy()
@@ -65,63 +78,88 @@ public abstract class MonsterAI : MonoBehaviour, IPool
 
     protected virtual void Update()
     {
-        WalkUpdate();
+        if (Input.GetKeyDown(KeyCode.Keypad1)) SetMonsterAction(MonsterAction.Spawn);
+        if (Input.GetKeyDown(KeyCode.Keypad2)) SetMonsterAction(MonsterAction.Idle);
+        if (Input.GetKeyDown(KeyCode.Keypad3)) SetMonsterAction(MonsterAction.Move);
+        if (Input.GetKeyDown(KeyCode.Keypad4)) SetMonsterAction(MonsterAction.Attack);
+        if (Input.GetKeyDown(KeyCode.Keypad5)) SetMonsterAction(MonsterAction.Death);
+        if (Input.GetKeyDown(KeyCode.Keypad6)) SetMonsterAction(MonsterAction.Dance);
+
+        if (Input.GetKeyDown(KeyCode.Keypad7)) FollowStart();
+        if (Input.GetKeyDown(KeyCode.Keypad8)) FollowEnd();
     }
 
-    protected void StartDetect()
+    public override void SetEnable()
     {
-        StopDetect();
+        base.SetEnable();
 
-        mDetectCoroutine = StartCoroutine(LoopDetect());
+        InitParam();
     }
 
-    protected IEnumerator LoopDetect()
+    public override void SetDisable()
     {
-        while (true)
-        {
-            Follow();
+        base.SetDisable();
 
-            yield return new WaitForSeconds(m_DetectInterval);
-        }
+        HUDManager.Retrieve(mMonsterHUD);
+
+        mMonsterHUD = null;
     }
 
-    public void SetEnable()
-    {
-        gameObject.SetActive(true);
-
-        IninParam();
-    }
-
-    public void SetDisable()
-    {
-        gameObject.SetActive(false);
-    }
-
-    private void IninParam()
+    private void InitParam()
     {
         m_UseParam.SetTo(m_OriginParam);
 
         mAgent.enabled = true;
         mAgent.speed = m_UseParam.MoveSpeed;
 
-        SetSpawn();
+        mMonsterHUD = HUDManager.Instance.Obtain("MonsterHUD");
+        mMonsterHUD.SetEnable();
+        mMonsterHUD.SetTarget(mTs);
+        mMonsterHUD.SetHealth(GetPercentHP());
+
+        SetMonsterAction(MonsterAction.Spawn);
+
+        RunLoop();
     }
 
-    protected void Follow()
+    protected void RunLoop()
+    {
+        mLoopCoroutine = StartCoroutine(Loop());
+    }
+
+    protected IEnumerator Loop()
+    {
+        while (true)
+        {
+            yield return StartCoroutine(mMonsterActionDict[mMonsterAction]());
+        }
+    }
+
+    protected void SetMonsterAction(MonsterAction monsterAction)
+    {
+        //if (mActionCoroutine != null)
+        //{
+        //    StopCoroutine(mActionCoroutine);
+        //    mActionCoroutine = null;
+        //}
+        
+        mMonsterAction = monsterAction;
+
+        Debug.LogFormat("SetMonsterAction:{0}", mMonsterAction);
+    }
+
+    protected void FollowStart()
     {
         if (mTargetTs != null)
+        {
+            mAgent.ResetPath();
             mAgent.SetDestination(mTargetTs.position);
+        }
     }
 
-    protected void StopDetect()
+    protected void FollowEnd()
     {
-        if (mDetectCoroutine != null)
-        {
-            StopCoroutine(mDetectCoroutine);
-            mDetectCoroutine = null;
-
-            mAgent.Stop();
-        }
+        mAgent.Stop();
     }
 
     public void SetPosition(Vector3 position)
@@ -137,6 +175,8 @@ public abstract class MonsterAI : MonoBehaviour, IPool
     public void SetTarget(Transform targetTs)
     {
         mTargetTs = targetTs;
+
+        SetRemain();
     }
 
     public int getHp()
@@ -148,18 +188,50 @@ public abstract class MonsterAI : MonoBehaviour, IPool
     {
         m_UseParam.HP = Mathf.Max(0, m_UseParam.HP - damage);
 
+        mMonsterHUD.SetHealth(GetPercentHP());
+
         if (IsDeath)
-            SetDeath();
+        {
+            SetMonsterAction(MonsterAction.Death);
+        }
     }
 
-    protected void SetSpawn()
+    private float GetPercentHP()
     {
-        StartCoroutine(SpawnHandle());
+        return (float)m_UseParam.HP / (float)m_OriginParam.HP;
     }
+
+    /*private IEnumerator UpdateRemain()
+    {
+        while (true)
+        {
+            RemainDistance = GetRemain();
+            yield return new WaitForSeconds(1f);
+        }
+    }*/
+
+    private void SetRemain()
+    {
+        NavMeshPath path = new NavMeshPath();
+
+        mAgent.CalculatePath(mTargetTs.position, path);
+
+        //Debug.Log("corners:" + path.corners.Length);
+
+        float remain = 0f;
+
+        for (int i = 0; i < path.corners.Length - 1; i++)
+        {
+            remain += Vector3.Distance(path.corners[i], path.corners[i + 1]);
+        }
+
+        RemainDistance = remain;
+    }
+
+    #region Monster State
 
     protected IEnumerator SpawnHandle()
     {
-        StopDetect();
         SetAnimTrigger(MonsterAI.SPAWN_HASH);
 
         yield return new WaitForSeconds(0.1f);
@@ -169,64 +241,94 @@ public abstract class MonsterAI : MonoBehaviour, IPool
         yield return new WaitForSeconds(1f);
 
         if (IsAlive)
-            SetIdle();
-    }
-
-    protected void SetIdle()
-    {
-        StartCoroutine(IdleHandle());
+        {
+            SetMonsterAction(MonsterAction.Idle);
+        }
     }
 
     protected IEnumerator IdleHandle()
     {
-        StopDetect();
         SetAnimTrigger(MonsterAI.IDLE_HASH);
 
-        yield return new WaitForSeconds(0.1f);
+        SetMonsterAction(MonsterAction.Move);
 
-        if (IsAlive)
-            StartDetect();
+        yield return null;
     }
 
-    protected void SetDeath()
+    protected IEnumerator AttackHandle()
     {
-        //StatusMgr.updateKill(1);
-        //StatusMgr.updateMoney(m_money);
-        //StatusMgr.updateScore(m_score);
+        while (mMonsterAction == MonsterAction.Attack)
+        {
+            PlayAttackAnim();
 
-        StartCoroutine(DeathHandle());
+            yield return new WaitForSeconds(1f);
+
+            Debug.Log("Call CoreBase");
+        }
+    }
+    
+    protected IEnumerator MoveHandle()
+    {
+        SetAnimBool(MonsterAI.WALK_HASH, true);
+
+        while (mMonsterAction == MonsterAction.Move)
+        {
+            SetRemain();
+
+            if (RemainDistance <= mAgent.stoppingDistance)
+            {
+                SetMonsterAction(MonsterAction.Attack);
+            }
+
+            FollowStart();
+            
+            yield return new WaitForSeconds(1f);
+        }
+
+        SetAnimBool(MonsterAI.WALK_HASH, false);
+        FollowEnd();
     }
 
     protected IEnumerator DeathHandle()
     {
-        StopDetect();
         SetAnimTrigger(MonsterAI.DEATH_HASH);
 
         mAgent.enabled = false;
+
+        StatusMgr.updateKill(1);
+        StatusMgr.updateMoney(m_money);
+        StatusMgr.updateScore(m_score);
 
         yield return new WaitForSeconds(5f);
 
         MonsterPools.Retrieve(this);
     }
 
-    protected void SetAttack()
+    protected IEnumerator DanceHandle()
     {
-        StopDetect();
+        yield return null;
+    }
+
+    #endregion
+
+    #region Animation
+
+    protected void PlayAttackAnim()
+    {
         SetAnimTrigger(MonsterAI.ATTACK_HASH);
     }
 
-    protected void SetDance()
+    protected void PlayDanceAnim()
     {
-        StopDetect();
         SetAnimTrigger(MonsterAI.DANCE_HASH);
     }
 
-    protected void WalkUpdate()
+    /*protected void WalkUpdate()
     {
         bool isWalk = !mAgent.velocity.normalized.Equals(Vector3.zero);
 
         SetAnimBool(MonsterAI.WALK_HASH, isWalk);
-    }
+    }*/
 
     protected void SetAnimTrigger(int hash)
     {
@@ -237,6 +339,10 @@ public abstract class MonsterAI : MonoBehaviour, IPool
     {
         mAni.SetBool(hash, value);
     }
+
+    #endregion
+
+    #region Effect
 
     protected void PlayEffect(string id)
     {
@@ -251,6 +357,10 @@ public abstract class MonsterAI : MonoBehaviour, IPool
         setting.SetEnable();
     }
 
+    #endregion
+
+    #region Data
+
     [System.Serializable]
     public class MonsterParam
     {
@@ -264,4 +374,69 @@ public abstract class MonsterAI : MonoBehaviour, IPool
         }
     }
 
+    #endregion
+
+    public enum MonsterAction
+    {
+        Spawn,
+        Idle,
+        Move,
+        Attack,
+        Death,
+        Dance
+    }
 }
+
+
+
+/*protected void StopDetect()
+{
+    if (mDetectCoroutine != null)
+    {
+        StopCoroutine(mDetectCoroutine);
+        mDetectCoroutine = null;
+
+        mAgent.Stop();
+    }
+}*/
+
+/*protected void StartDetect()
+{
+    StopDetect();
+
+    StartCoroutine(Loop());
+    //mDetectCoroutine = StartCoroutine(LoopDetect());
+}*/
+
+/*protected IEnumerator LoopDetect()
+{
+    //while (true)
+    //{
+    //    Follow();
+    //    yield return new WaitForSeconds(m_DetectInterval);
+    //}
+
+    Follow();
+    //
+    while (true)
+    {
+
+
+        Debug.LogFormat("{0}<={1}", GetRemain(), mAgent.stoppingDistance);
+        yield return null;
+    }
+
+    //yield return null;
+
+    //while (mAgent.pathStatus != NavMeshPathStatus.PathComplete)
+    //{
+    //    Debug.Log("pathStatus:" + mAgent.pathStatus);
+    //    yield return null;
+    //    //yield return new WaitForSeconds(m_DetectInterval);
+    //}
+
+    //while (mAgent.pathPending)
+    //{
+    //    yield return null;
+    //}
+}*/

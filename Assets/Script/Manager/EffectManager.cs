@@ -5,16 +5,6 @@ public class EffectManager : ObjectPools<EffectManager, EffectSetting>
 {
     protected override Transform ContainerTs { get { return mGameMgr.MapMgr.EffectContainerTs; } }
 
-    protected override void Awake()
-    {
-        base.Awake();
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-    }
-
     public static void Retrieve(EffectSetting obj)
     {
         Instance.InsRetrieve(obj);

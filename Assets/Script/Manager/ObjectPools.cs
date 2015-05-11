@@ -53,9 +53,29 @@ public abstract class ObjectPools<T1, T2> : MonoSingleTon<T1>
     public abstract T2 CreateNew(string id);
 
 }
-public interface IPool
+//public interface IPool
+//{
+//    string ID { get; }
+//    void SetDisable();
+//    void SetEnable();
+//}
+
+public class IPool : MonoBehaviour
 {
-    string ID { get; }
-    void SetDisable();
-    void SetEnable();
+    protected string mID = string.Empty;
+
+    public virtual string ID { get { return mID; } }
+
+    public virtual void SetEnable()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public virtual void SetDisable()
+    {
+        gameObject.SetActive(false);
+
+        transform.position = Vector3.zero;
+        transform.rotation = Quaternion.identity;
+    }
 }
