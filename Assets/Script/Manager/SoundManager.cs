@@ -3,6 +3,17 @@ using System.Collections;
 
 public class SoundManager : MonoBehaviour
 {
+    #region Unity Event
+
+    void Awake()
+    {
+        PlaySound();
+    }
+
+    #endregion
+
+    #region Music
+
     [SerializeField]
     private AudioSource m_AudioSource = null;
 
@@ -12,11 +23,6 @@ public class SoundManager : MonoBehaviour
     private Coroutine mCoroutine = null;
 
     private int mIndex = 0;
-
-    void Awake()
-    {
-        PlaySound();
-    }
 
     private void PlaySound()
     {
@@ -50,4 +56,18 @@ public class SoundManager : MonoBehaviour
 
         PlaySound();
     }
+
+    #endregion
+
+    #region Sfx
+
+    private const string SFX_PATH = "Sound/Sfx/{0}";
+
+    public static AudioClip GetAudioClip(string id)
+    {
+        return Resources.Load<AudioClip>(string.Format(SFX_PATH, id));
+    }
+
+    #endregion
+
 }

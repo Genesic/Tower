@@ -165,14 +165,20 @@ public class GameManager : MonoSingleTon<GameManager>
     {
         if (Input.GetKeyDown(KeyCode.Space)) LookAtNearestMonster();
 
-        if (Input.GetKeyDown(KeyCode.Alpha1)) EnemySpawnMgr.SpawnEnemy();
+        //if (Input.GetKeyDown(KeyCode.Alpha1)) EnemySpawnMgr.SpawnEnemy();
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            var point = MapMgr.TargetTs.position + MathUtility.GetRandomRadiusPoint(4f);
+
+            Debug.DrawLine(MapMgr.TargetTs.position, point, Color.red, 1f);
+        }
     }
 
-    //void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.green;
-    //    Gizmos.DrawWireSphere(mTestPos, 1f);
-    //}
+    /*void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        //Gizmos.DrawWireSphere(mTestPos, 1f);
+    }*/
 
     #endregion
 

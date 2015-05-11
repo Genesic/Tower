@@ -14,6 +14,25 @@ public abstract class MonsterAI : IPool
     protected string RebornEffect { get { return "MagicAuras/Prefabs/Shadow/GroundShadow"; } }
     protected bool IsAlive { get { return m_UseParam.HP > 0; } }
     protected bool IsDeath { get { return !IsAlive; } }
+
+    private AudioSource mAudio = null;
+    protected AudioSource Audio
+    {
+        get
+        {
+            if (mAudio == null)
+            {
+                mAudio = gameObject.AddComponent<AudioSource>();
+                mAudio.playOnAwake = false;
+                mAudio.spatialBlend = 1f;
+                mAudio.minDistance = 10;
+                mAudio.maxDistance = 20f;
+            }
+
+            return mAudio;
+        }
+    }
+
     public float RemainDistance { get; private set; }
 
     protected StatusManager StatusMgr;
@@ -40,16 +59,18 @@ public abstract class MonsterAI : IPool
 
     protected Transform mTargetTs = null;
 
+    protected Vector3 mAttackPoint = Vector3.zero;
+
     protected Animator mAni = null;
 
     protected NavMeshAgent mAgent = null;
 
     private Coroutine mLoopCoroutine = null;
-    //private Coroutine mActionCoroutine = null;
 
     private MonsterHUD mMonsterHUD = null;
     
     private MonsterAction mMonsterAction = MonsterAction.Idle;
+
     private Dictionary<MonsterAction, System.Func<IEnumerator>> mMonsterActionDict = new Dictionary<MonsterAction, System.Func<IEnumerator>>();
 
     protected virtual void Awake()
@@ -87,6 +108,7 @@ public abstract class MonsterAI : IPool
 
         if (Input.GetKeyDown(KeyCode.Keypad7)) FollowStart();
         if (Input.GetKeyDown(KeyCode.Keypad8)) FollowEnd();
+        if (Input.GetKeyDown(KeyCode.Keypad9)) PlaySfx("attack_01");
     }
 
     public override void SetEnable()
@@ -109,8 +131,9 @@ public abstract class MonsterAI : IPool
     {
         m_UseParam.SetTo(m_OriginParam);
 
-        mAgent.enabled = true;
         mAgent.speed = m_UseParam.MoveSpeed;
+
+        mAttackPoint = Vector3.zero;
 
         mMonsterHUD = HUDManager.Instance.Obtain("MonsterHUD");
         mMonsterHUD.SetEnable();
@@ -137,12 +160,6 @@ public abstract class MonsterAI : IPool
 
     protected void SetMonsterAction(MonsterAction monsterAction)
     {
-        //if (mActionCoroutine != null)
-        //{
-        //    StopCoroutine(mActionCoroutine);
-        //    mActionCoroutine = null;
-        //}
-        
         mMonsterAction = monsterAction;
 
         Debug.LogFormat("SetMonsterAction:{0}", mMonsterAction);
@@ -150,11 +167,11 @@ public abstract class MonsterAI : IPool
 
     protected void FollowStart()
     {
-        if (mTargetTs != null)
-        {
-            mAgent.ResetPath();
-            mAgent.SetDestination(mTargetTs.position);
-        }
+        if (mTargetTs == null)
+            return;
+
+        mAgent.ResetPath();
+        mAgent.SetDestination(mAttackPoint);
     }
 
     protected void FollowEnd()
@@ -175,6 +192,7 @@ public abstract class MonsterAI : IPool
     public void SetTarget(Transform targetTs)
     {
         mTargetTs = targetTs;
+        mAttackPoint = mTargetTs.position + MathUtility.GetRandomRadiusPoint(4f);
 
         SetRemain();
     }
@@ -201,20 +219,11 @@ public abstract class MonsterAI : IPool
         return (float)m_UseParam.HP / (float)m_OriginParam.HP;
     }
 
-    /*private IEnumerator UpdateRemain()
-    {
-        while (true)
-        {
-            RemainDistance = GetRemain();
-            yield return new WaitForSeconds(1f);
-        }
-    }*/
-
     private void SetRemain()
     {
         NavMeshPath path = new NavMeshPath();
 
-        mAgent.CalculatePath(mTargetTs.position, path);
+        mAgent.CalculatePath(mAttackPoint, path);
 
         //Debug.Log("corners:" + path.corners.Length);
 
@@ -257,11 +266,13 @@ public abstract class MonsterAI : IPool
 
     protected IEnumerator AttackHandle()
     {
+        mTs.forward = (mTargetTs.position - mTs.position).normalized;
+
         while (mMonsterAction == MonsterAction.Attack)
         {
             PlayAttackAnim();
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(1.5f);
 
             Debug.Log("Call CoreBase");
         }
@@ -270,6 +281,7 @@ public abstract class MonsterAI : IPool
     protected IEnumerator MoveHandle()
     {
         SetAnimBool(MonsterAI.WALK_HASH, true);
+        FollowStart();
 
         while (mMonsterAction == MonsterAction.Move)
         {
@@ -280,8 +292,6 @@ public abstract class MonsterAI : IPool
                 SetMonsterAction(MonsterAction.Attack);
             }
 
-            FollowStart();
-            
             yield return new WaitForSeconds(1f);
         }
 
@@ -293,7 +303,7 @@ public abstract class MonsterAI : IPool
     {
         SetAnimTrigger(MonsterAI.DEATH_HASH);
 
-        mAgent.enabled = false;
+        FollowEnd();
 
         StatusMgr.updateKill(1);
         StatusMgr.updateMoney(m_money);
@@ -315,6 +325,7 @@ public abstract class MonsterAI : IPool
 
     protected void PlayAttackAnim()
     {
+        PlaySfx("attack_01");
         SetAnimTrigger(MonsterAI.ATTACK_HASH);
     }
 
@@ -322,13 +333,6 @@ public abstract class MonsterAI : IPool
     {
         SetAnimTrigger(MonsterAI.DANCE_HASH);
     }
-
-    /*protected void WalkUpdate()
-    {
-        bool isWalk = !mAgent.velocity.normalized.Equals(Vector3.zero);
-
-        SetAnimBool(MonsterAI.WALK_HASH, isWalk);
-    }*/
 
     protected void SetAnimTrigger(int hash)
     {
@@ -359,6 +363,15 @@ public abstract class MonsterAI : IPool
 
     #endregion
 
+    #region sfx
+
+    private void PlaySfx(string id)
+    {
+        Audio.PlayOneShot(SoundManager.GetAudioClip("attack_01"));
+    }
+
+    #endregion
+
     #region Data
 
     [System.Serializable]
@@ -374,8 +387,6 @@ public abstract class MonsterAI : IPool
         }
     }
 
-    #endregion
-
     public enum MonsterAction
     {
         Spawn,
@@ -385,9 +396,39 @@ public abstract class MonsterAI : IPool
         Death,
         Dance
     }
+
+    #endregion
+
+    /*void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(mAttackPoint, 1f);
+    }*/
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(mAttackPoint, 1f);
+    }
 }
 
 
+/*private IEnumerator UpdateRemain()
+{
+    while (true)
+    {
+        RemainDistance = GetRemain();
+        yield return new WaitForSeconds(1f);
+    }
+}*/
+
+
+/*protected void WalkUpdate()
+{
+    bool isWalk = !mAgent.velocity.normalized.Equals(Vector3.zero);
+
+    SetAnimBool(MonsterAI.WALK_HASH, isWalk);
+}*/
 
 /*protected void StopDetect()
 {
