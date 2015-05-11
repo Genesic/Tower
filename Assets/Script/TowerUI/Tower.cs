@@ -10,8 +10,7 @@ public class Tower : MonoBehaviour, ICannon {
 	public int level;
 	public string tower_name;
 
-	
-	public GameObject shot;
+	private BulletManager BulletPool;
 	public float fireRate;
 	
 	private float nextFire;
@@ -26,15 +25,14 @@ public class Tower : MonoBehaviour, ICannon {
 	public string towerName { get { return tower_name; } }
 
 	private MonsterAI lockMonster;
-	private Transform child_rotate;
+	public Transform child_rotate;
+	private Vector3 ShotSpwan;
 
-	void Awake(){
-		Transform[] allChildren = GetComponentsInChildren<Transform>();
-		foreach (Transform child in allChildren) {
-			if( child.tag == "tower_rotate" ){
-				child_rotate = child;
-			}
-		}
+	void Awake()
+	{
+		GameObject gameMgr = GameObject.Find ("GameManager");
+		BulletPool = gameMgr.GetComponent<BulletManager>();
+		Debug.Log (BulletPool);
 	}
 
 	// Update is called once per frame
@@ -59,16 +57,17 @@ public class Tower : MonoBehaviour, ICannon {
 			}
 		}
 
-		Vector3 ShotSpwan = child_rotate.position + new Vector3(0,0.5f,0);
-		
 		if (LockIdx >= 0) {
 			Collider LockCollider = hitColliders [LockIdx];
 			if (Time.time > nextFire && Time.time > startFire) {
 				nextFire = Time.time + fireRate;
-				GameObject Bullet = (GameObject)Instantiate (shot, ShotSpwan, transform.rotation);
-				Vector3 direction = (LockCollider.gameObject.transform.position - ShotSpwan).normalized;
-				Bullet.GetComponent<Rigidbody> ().velocity = direction * speed;
-				LockCollider.gameObject.GetComponent<MonsterAI> ().Damage(damage);
+				var Bullet = BulletPool.Obtain("basic");
+				Bullet.SetPosition(ShotSpwan);
+				Bullet.SetRotation(transform.rotation);
+				Bullet.SetEnable();
+				Vector3 direction = (LockCollider.gameObject.transform.position - child_rotate.position).normalized;
+				Bullet.SetVelocity(direction, speed);
+				LockCollider.gameObject.GetComponent<MonsterAI>().Damage(damage);
 			}
 		}
 	}
@@ -78,6 +77,8 @@ public class Tower : MonoBehaviour, ICannon {
 			Vector3 targetDir = lockMonster.transform.position - child_rotate.transform.position;
 			Vector3 newDir = Vector3.RotateTowards( child_rotate.transform.forward, targetDir, 0.05F, 0.0F );				
 			child_rotate.transform.rotation = Quaternion.LookRotation(newDir);
+
+			ShotSpwan = child_rotate.position + new Vector3(0.0F,0.5f, 0.0F );
 		}
 	}
 
