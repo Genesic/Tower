@@ -14,7 +14,7 @@ public class HUD : MonoBehaviour {
 	float timeCount = 0;
 	// Use this for initialization
 	void Start () {
-		currentHP = maxHP;
+		currentHP = 1;
 
 		HPUI = Instantiate(Resources.Load ("HUD/HPBar")) as GameObject;
 		HPUI.transform.parent = GameObject.Find ("Canvas").transform;
@@ -40,24 +40,21 @@ public class HUD : MonoBehaviour {
 		timeCount += Time.deltaTime;
 		if (timeCount >= 0.1f) 
 		{
-			MinusUIHP(0.01f);
+			currentHP -= 0.01f;
+			SetUIHP(currentHP);
 			timeCount = 0;
 		}
 	}
 
 	//輸入扣血由0到1
-	public void MinusUIHP(float maxIsOne)
+	public void SetUIHP(float maxIsOne)
 	{
-		if (currentHP > 0) 
-		{
-			currentHP -= (maxIsOne * maxHP);
+		if (maxIsOne <= 0)
+			maxIsOne = 0;
 
-			if (currentHP <= 0)
-				currentHP = 0;
-
-			HPText.text = currentHP + " / " + maxHP;
-			HPScroll.rectTransform.anchoredPosition = new Vector2 (HPScroll.rectTransform.anchoredPosition.x - maxIsOne * 180, 0);
-		}
+		int nowHP = (int)(maxIsOne * maxHP);
+		HPText.text = nowHP + " / " + maxHP;
+		HPScroll.rectTransform.anchoredPosition = new Vector2 ((maxIsOne - 1) * 180, 0);
 	}
 		
 }
