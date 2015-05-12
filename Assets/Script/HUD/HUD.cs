@@ -3,10 +3,10 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class HUD : MonoBehaviour {
-	GameObject healthUI;
-	Image healthScroll;
+	GameObject HPUI;
+	Image HPScroll;
 
-	Text healthText;
+	Text HPText;
 	float maxHP = 100;
 	float currentHP;
 
@@ -16,22 +16,22 @@ public class HUD : MonoBehaviour {
 	void Start () {
 		currentHP = maxHP;
 
-		healthUI = Instantiate(Resources.Load ("HUD/healthBar")) as GameObject;
-		healthUI.transform.parent = GameObject.Find ("Canvas").transform;
-		healthUI.GetComponent<RectTransform> ().anchoredPosition = new Vector2 (0, 370);
+		HPUI = Instantiate(Resources.Load ("HUD/HPBar")) as GameObject;
+		HPUI.transform.parent = GameObject.Find ("Canvas").transform;
+		HPUI.GetComponent<RectTransform> ().anchoredPosition = new Vector2 (0, 370);
 
-		Image[] images = healthUI.GetComponentsInChildren<Image> ();
+		Image[] images = HPUI.GetComponentsInChildren<Image> ();
 		foreach (Image image in images)
 		{
-			if(image.name.Equals("healthScroll"))
-				healthScroll = image;
+			if(image.name.Equals("HPScroll"))
+				HPScroll = image;
 		}
 
-		Text[] texts = healthUI.GetComponentsInChildren<Text> ();
+		Text[] texts = HPUI.GetComponentsInChildren<Text> ();
 		foreach (Text text in texts)
 		{
-			if(text.name.Equals("healthText"))
-				healthText = text;
+			if(text.name.Equals("HPText"))
+				HPText = text;
 		}
 	}
 	
@@ -49,8 +49,10 @@ public class HUD : MonoBehaviour {
 	public void MinusUIHP(float maxIsOne)
 	{
 		currentHP -= (maxIsOne * maxHP);
-		healthText.text = currentHP +" / "+ maxHP;
-		healthScroll.rectTransform.anchoredPosition = new Vector2(healthScroll.rectTransform.anchoredPosition.x - maxIsOne * 190, 0);
+		if (currentHP <= 0)
+			currentHP = 0;
+		HPText.text = currentHP +" / "+ maxHP;
+		HPScroll.rectTransform.anchoredPosition = new Vector2(HPScroll.rectTransform.anchoredPosition.x - maxIsOne * 180, 0);
 	}
 		
 }
