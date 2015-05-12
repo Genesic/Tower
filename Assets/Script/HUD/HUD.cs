@@ -36,17 +36,12 @@ public class HUD : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		timeCount += Time.deltaTime;
-		if (timeCount >= 0.1f) 
-		{
-			currentHP -= 0.01f;
-			SetUIHP(currentHP);
-			timeCount = 0;
-		}
+	void Update () 
+	{
+
 	}
 
-	//輸入扣血由0到1
+	//直接設定血量
 	public void SetUIHP(float maxIsOne)
 	{
 		if (maxIsOne <= 0)
