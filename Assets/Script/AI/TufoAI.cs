@@ -3,8 +3,8 @@ using System.Collections;
 
 public class TufoAI : MonsterAI
 {
-    //protected override void Awake()
-    //{
-    //    base.Awake();
-    //}
+    /*protected override void Awake()
+    {
+        base.Awake();
+    }*/
 }

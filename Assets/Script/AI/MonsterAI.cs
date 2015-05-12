@@ -63,6 +63,8 @@ public abstract class MonsterAI : IPool
 
     protected Animator mAni = null;
 
+    protected AttackSmb mAttackSmb = null;
+
     protected NavMeshAgent mAgent = null;
 
     private Coroutine mLoopCoroutine = null;
@@ -80,7 +82,10 @@ public abstract class MonsterAI : IPool
         mID = m_MonsterID;
 
         mAgent = GetComponent<NavMeshAgent>();
+
         mAni = GetComponentInChildren<Animator>();
+        mAttackSmb = mAni.GetBehaviour<AttackSmb>();
+        mAttackSmb.MonsterAI = this;
 
         StatusMgr = GameManager.Instance.StatusMgr;
 
@@ -282,6 +287,8 @@ public abstract class MonsterAI : IPool
         SetAnimBool(MonsterAI.WALK_HASH, true);
         FollowStart();
 
+        float time = Time.time;
+
         while (mMonsterAction == MonsterAction.Move)
         {
             SetRemain();
@@ -291,9 +298,12 @@ public abstract class MonsterAI : IPool
                 SetMonsterAction(MonsterAction.Attack);
             }
 
-            yield return new WaitForSeconds(1f);
-        }
+            while (Time.time - time < 1f && mMonsterAction == MonsterAction.Move)
+                yield return null;
 
+            time = Time.time;
+        }
+        
         SetAnimBool(MonsterAI.WALK_HASH, false);
         FollowEnd();
     }
