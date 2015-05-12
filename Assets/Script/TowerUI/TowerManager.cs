@@ -30,6 +30,7 @@ public class TowerManager : MonoBehaviour {
 			Quaternion TowerRotation = Quaternion.identity;
 			Tower buildTower = Instantiate (useTower, TowerPosition, TowerRotation) as Tower;
 			useCannon.BuildCannon (buildTower);
+			buildTower.setUseCannon(useCannon);
 		}
 
 		// 關閉UI介面

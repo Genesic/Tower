@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -19,7 +19,8 @@ public class CannonPlatform : MonoBehaviour
     public string ID { get { return name; } }
 
     private StatusManager statusManager;
-    private ErrMessage errMsg;
+	private UIManager uiManager;
+	private ErrMessage errMsg;
 
     public int getLevel { get { return mCannon.Level; } }
     public string getName { get { return mCannon.towerName; } }
@@ -31,18 +32,16 @@ public class CannonPlatform : MonoBehaviour
     {
         mTs = transform;
 
-        GameObject status = GameObject.Find("GameManager");
+        GameObject gameManager = GameObject.Find("GameManager");
 
-        if (status == null)
+        if (gameManager == null)
         {
             return;
         }
 
-        statusManager = status.GetComponent<StatusManager>();
-
-        GameObject ErrMsg = GameObject.FindGameObjectWithTag("ErrMsg");
-        if (ErrMsg)
-            errMsg = ErrMsg.GetComponent<ErrMessage>();
+        statusManager = gameManager.GetComponent<StatusManager>();
+		uiManager = gameManager.GetComponent<UIManager> ();
+		errMsg = uiManager.getErrMsg ();
     }
     /// <summary>檢查可否建置砲塔</summary>
     public bool checkBuildCannon(ICannon cannon)
@@ -92,5 +91,6 @@ public class CannonPlatform : MonoBehaviour
     }
 
 	void OnMouseDown() {
+		uiManager.setMouseDownCubePanel (this);
 	}
 }

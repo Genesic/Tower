@@ -11,6 +11,7 @@ public class Tower : MonoBehaviour, ICannon {
 	public string tower_name;
 
 	private BulletManager BulletPool;
+	public CannonPlatform useCannon;
 	public float fireRate;
 	
 	private float nextFire;
@@ -27,12 +28,17 @@ public class Tower : MonoBehaviour, ICannon {
 	private MonsterAI lockMonster;
 	public Transform child_rotate;
 	private Vector3 ShotSpwan;
+	private UIManager uiManager;
+
+	public void setUseCannon(CannonPlatform selectCannon){
+		useCannon = selectCannon;
+	}
 
 	void Awake()
 	{
 		GameObject gameMgr = GameObject.Find ("GameManager");
 		BulletPool = gameMgr.GetComponent<BulletManager>();
-		Debug.Log (BulletPool);
+		uiManager = gameMgr.GetComponent<UIManager> ();
 	}
 
 	// Update is called once per frame
@@ -87,7 +93,10 @@ public class Tower : MonoBehaviour, ICannon {
 		child_rotate.transform.rotation = Quaternion.LookRotation(newDir);
 
 		ShotSpwan = child_rotate.position + new Vector3(0.0F,0.5f, 0.0F );
-		
+	}
+
+	void OnMouseDown(){
+		uiManager.setMouseDownTowerPanel (useCannon);
 	}
 
 	public void destroy(){

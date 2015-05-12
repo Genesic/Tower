@@ -108,6 +108,5 @@ public class ClickManager : MonoBehaviour {
 		Vector3 newPosition = getPanelPosition();
 		selectTowerPannel.transform.position = newPosition;
 		selectTowerPannel.SetActive(true);
-
 	}
 }
