@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CoreBase : MonoBehaviour
+public class BaseCore : MonoBehaviour
 {
     public const int HP_MAX = 1000;
     public int Hp = HP_MAX;
@@ -10,14 +10,24 @@ public class CoreBase : MonoBehaviour
     {
         Hp = Mathf.Max(0, Hp - damage);
 
+        UpdateBaseCoreHP((float)Hp / HP_MAX);
+        
         if (Hp == 0)
         {
             CoreBomb();
         }
     }
 
+    private void UpdateBaseCoreHP(float percent)
+    {
+        Debug.Log("UpdateBaseCoreHP:" + percent);
+
+        GameManager.Instance.BaseHUD.MinusUIHP(percent);
+    }
+
     private void CoreBomb()
     {
         Debug.Log("CoreBomb");
+
     }
 }

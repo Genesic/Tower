@@ -278,7 +278,7 @@ public abstract class MonsterAI : IPool
 
             yield return new WaitForSeconds(1.5f);
 
-            //Debug.Log("Call CoreBase");
+            GameManager.Instance.CoreTarget.Damage(m_UseParam.Damage);
         }
     }
     
@@ -388,11 +388,13 @@ public abstract class MonsterAI : IPool
     {
         public int HP = 0;
         public float MoveSpeed = 2f;
+        public int Damage = 50;
 
         public void SetTo(MonsterParam param)
         {
             HP = param.HP;
             MoveSpeed = param.MoveSpeed;
+            Damage = param.Damage;
         }
     }
 

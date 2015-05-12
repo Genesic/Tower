@@ -17,6 +17,10 @@ public class GameManager : MonoSingleTon<GameManager>
 
     public StatusManager StatusMgr { get; private set; }
 
+    public HUD BaseHUD { get; private set; }
+
+    public BaseCore CoreTarget { get; private set; }
+    
     [SerializeField]
     private Canvas m_UICanvas = null;
     public Canvas UICanvas
@@ -85,7 +89,8 @@ public class GameManager : MonoSingleTon<GameManager>
 
         gameObject.AddComponent<EffectManager>();
         gameObject.AddComponent<HUDManager>();
-        MapMgr.gameObject.AddComponent<CoreBase>();
+        CoreTarget = MapMgr.TargetTs.gameObject.AddComponent<BaseCore>();
+        BaseHUD = UICanvas.GetComponent<HUD>();
     }
 
     private IEnumerator UpdateEnvironment()
