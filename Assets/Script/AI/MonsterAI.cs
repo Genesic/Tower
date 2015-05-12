@@ -276,7 +276,7 @@ public abstract class MonsterAI : IPool
         {
             PlayAttackAnim();
 
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(2f);
 
             GameManager.Instance.CoreTarget.Damage(m_UseParam.Damage);
         }
