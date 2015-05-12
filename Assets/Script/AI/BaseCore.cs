@@ -22,7 +22,7 @@ public class BaseCore : MonoBehaviour
     {
         Debug.Log("UpdateBaseCoreHP:" + percent);
 
-        GameManager.Instance.BaseHUD.MinusUIHP(percent);
+        GameManager.Instance.BaseHUD.SetUIHP(percent);
     }
 
     private void CoreBomb()
