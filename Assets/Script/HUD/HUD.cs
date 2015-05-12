@@ -7,14 +7,10 @@ public class HUD : MonoBehaviour {
 	Image HPScroll;
 
 	Text HPText;
-	float maxHP = 100;
-	float currentHP;
+	float maxHP = 1000;
 
-
-	float timeCount = 0;
 	// Use this for initialization
 	void Start () {
-		currentHP = 1;
 
 		HPUI = Instantiate(Resources.Load ("HUD/HPBar")) as GameObject;
 		HPUI.transform.parent = GameObject.Find ("Canvas").transform;
@@ -38,7 +34,6 @@ public class HUD : MonoBehaviour {
 	// Update is called once per frame
 	void Update () 
 	{
-
 	}
 
 	//直接設定血量
@@ -49,6 +44,7 @@ public class HUD : MonoBehaviour {
 
 		int nowHP = (int)(maxIsOne * maxHP);
 		HPText.text = nowHP + " / " + maxHP;
+		HPText.rectTransform.anchoredPosition = new Vector2 ();
 		HPScroll.rectTransform.anchoredPosition = new Vector2 ((maxIsOne - 1) * 180, 0);
 	}
 		
