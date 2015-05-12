@@ -90,4 +90,7 @@ public class CannonPlatform : MonoBehaviour
         mCannon.destroy();
         mCannon = null;
     }
+
+	void OnMouseDown() {
+	}
 }
