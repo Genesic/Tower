@@ -48,11 +48,16 @@ public class HUD : MonoBehaviour {
 	//輸入扣血由0到1
 	public void MinusUIHP(float maxIsOne)
 	{
-		currentHP -= (maxIsOne * maxHP);
-		if (currentHP <= 0)
-			currentHP = 0;
-		HPText.text = currentHP +" / "+ maxHP;
-		HPScroll.rectTransform.anchoredPosition = new Vector2(HPScroll.rectTransform.anchoredPosition.x - maxIsOne * 180, 0);
+		if (currentHP > 0) 
+		{
+			currentHP -= (maxIsOne * maxHP);
+
+			if (currentHP <= 0)
+				currentHP = 0;
+
+			HPText.text = currentHP + " / " + maxHP;
+			HPScroll.rectTransform.anchoredPosition = new Vector2 (HPScroll.rectTransform.anchoredPosition.x - maxIsOne * 180, 0);
+		}
 	}
 		
 }
