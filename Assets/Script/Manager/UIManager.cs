@@ -3,7 +3,9 @@ using System.Collections;
 
 public class UIManager : MonoBehaviour {
 
+	public Canvas canvas;
 	public ErrMessage errMsg;
+	public GameObject statusPanel;
 	public GameObject selectTowerPanel;
 	public GameObject TowerStatusPanel;
 
@@ -45,8 +47,8 @@ public class UIManager : MonoBehaviour {
 	public void openBuildTowerPanel (CannonPlatform selectCannon){
 		closeAllPanel ();
 		selectTowerPanel.GetComponent<TowerManager>().set_useCannon(selectCannon);
-		Vector3 newPosition = getPanelPosition();
-		selectTowerPanel.transform.position = newPosition;
+		Vector3 newPosition = getPanelPosition(selectTowerPanel);
+		selectTowerPanel.GetComponent<RectTransform> ().position = newPosition;
 		selectTowerPanel.SetActive(true);
 	}
 
@@ -54,8 +56,8 @@ public class UIManager : MonoBehaviour {
 	public void openTowerStatusPanel (CannonPlatform selectCannon){
 		closeAllPanel ();
 		TowerStatusPanel.GetComponent<TowerStatusManager>().set_useCannon(selectCannon);
-		Vector3 newPosition = getPanelPosition();
-		TowerStatusPanel.transform.position = newPosition;
+		Vector3 newPosition = getPanelPosition(TowerStatusPanel);
+		TowerStatusPanel.GetComponent<RectTransform> ().position = newPosition;
 		TowerStatusPanel.SetActive(true);
 	}
 
@@ -74,34 +76,50 @@ public class UIManager : MonoBehaviour {
 	// 檢查是否有點到其他UI介面
 	bool check_other_ui_panel(){
 		Vector2 check = Input.mousePosition;
-		if (check.x > 833 && check.y > 456)
+		float canvas_width = canvas.GetComponent<RectTransform>().rect.width * canvas.scaleFactor;
+		float canvas_height = canvas.GetComponent<RectTransform> ().rect.height * canvas.scaleFactor;
+		RectTransform  statusRt = statusPanel.GetComponent<RectTransform> ();
+
+		float width = statusRt.rect.width * canvas.scaleFactor;
+		float height = statusRt.rect.height * canvas.scaleFactor;
+
+		if (check.x > canvas_width - width  && check.y > canvas_height - height )
 			return false;
 		
-		if (check.x < 121 && check.y > 460)
+		if (check.x < width && check.y > canvas_height - height)
 			return false;
 		
 		return true;
 	}
 
 	// 關閉所有介面
-	void closeAllPanel() {
+	public void closeAllPanel() {
 		selectTowerPanel.SetActive(false);
 		TowerStatusPanel.SetActive(false);
 	}
 	
 	// 計算介面開啟後的位置
-	Vector3 getPanelPosition(){
-		Vector3 newPosition = Input.mousePosition;
-		newPosition.x += 64.0F;
-		newPosition.y -= 110.0F;
+	Vector3 getPanelPosition( GameObject panel){
+		float canvas_width = canvas.GetComponent<RectTransform>().rect.width * canvas.scaleFactor;
+		float canvas_height = canvas.GetComponent<RectTransform> ().rect.height * canvas.scaleFactor;
+		RectTransform rt = panel.GetComponent<RectTransform> ();
+		Vector2 newPosition = Input.mousePosition;
+		float offset = 10.0f;
+		float width = (rt.rect.width + offset ) * canvas.scaleFactor;
+		float height = (rt.rect.height ) * canvas.scaleFactor;
 		
-		if( newPosition.x > 776 ){
-			newPosition.x -= 128.0F;
-		}
-		if( newPosition.y < 120 ){
-			newPosition.y += 220.0F;
+		if (newPosition.x + width > canvas_width ) {
+			newPosition.x -= width / 2;
+		} else {
+			newPosition.x += width / 2;
 		}
 		
+		if (newPosition.y + height > canvas_height ) {
+			newPosition.y -= height / 2;
+		} else {
+			newPosition.y += height / 2 ;
+		}
+
 		return newPosition;
 	}
 

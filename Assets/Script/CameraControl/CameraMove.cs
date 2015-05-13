@@ -3,6 +3,7 @@ using System.Collections;
 
 public class CameraMove : MonoBehaviour {
 
+	public UIManager uiCtrl;
 	public float turnSpeed = 4.0f;		// Speed of camera turning when mouse moves in along an axis
 	public float panSpeed = 4.0f;		// Speed of the camera when being panned
 	public float zoomSpeed = 4.0f;		// Speed of the camera going back and forth
@@ -59,6 +60,9 @@ public class CameraMove : MonoBehaviour {
 
 			if (transform.position.x < -10 || transform.position.x > 85 || transform.position.z > 60 || transform.position.z < -40)
 				transform.position = beforeMovePos;
+
+			if( Vector3.Magnitude(move) > 0 )
+				uiCtrl.closeAllPanel();
 		}
 
 		// Rotate camera along X and Y axis
@@ -66,6 +70,9 @@ public class CameraMove : MonoBehaviour {
 		{
 			Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - mouseOrigin);
 			transform.RotateAround(transform.position, Vector3.up, -pos.x * turnSpeed);
+
+			if( Vector3.Magnitude(pos) > 0)
+				uiCtrl.closeAllPanel();
 		}
 
 		// 	--- keyboard part ---
@@ -78,6 +85,8 @@ public class CameraMove : MonoBehaviour {
 
 			if (transform.position.x < -10 || transform.position.x > 85 || transform.position.z > 60 || transform.position.z < -40)
 				transform.position = beforeMovePos;
+
+			uiCtrl.closeAllPanel();
 		}
 		if (Input.GetKey(KeyCode.S))
 		{
@@ -87,6 +96,8 @@ public class CameraMove : MonoBehaviour {
 
 			if (transform.position.x < -10 || transform.position.x > 85 || transform.position.z > 60 || transform.position.z < -40)
 				transform.position = beforeMovePos;
+
+			uiCtrl.closeAllPanel();
 		}
 		if (Input.GetKey(KeyCode.A))
 		{
@@ -96,6 +107,8 @@ public class CameraMove : MonoBehaviour {
 
 			if (transform.position.x < -10 || transform.position.x > 85 || transform.position.z > 60 || transform.position.z < -40)
 				transform.position = beforeMovePos;
+
+			uiCtrl.closeAllPanel();
 		}
 		if (Input.GetKey(KeyCode.D))
 		{
@@ -105,29 +118,36 @@ public class CameraMove : MonoBehaviour {
 
 			if (transform.position.x < -10 || transform.position.x > 85 || transform.position.z > 60 || transform.position.z < -40)
 				transform.position = beforeMovePos;
+
+			uiCtrl.closeAllPanel();
 		}
 
 		//	--Rotate--
 		if (Input.GetKey(KeyCode.Q))
 		{
-
 			transform.RotateAround(transform.position, new Vector3(0, -1, 0), keyboardTurnSpeed);
+			uiCtrl.closeAllPanel();
 		}
 		if (Input.GetKey(KeyCode.E))
 		{
 			transform.RotateAround(transform.position, new Vector3(0, 1, 0), keyboardTurnSpeed);
+			uiCtrl.closeAllPanel();
 		}
 		if (Input.GetKey(KeyCode.Alpha2))
 		{
 			GameObject cam = GameObject.Find("Main Camera");
 			if(cam)
 				cam.transform.Rotate(-1, 0, 0);
+
+			uiCtrl.closeAllPanel();
 		}
 		if (Input.GetKey(KeyCode.X))
 		{
 			GameObject cam = GameObject.Find("Main Camera");
 			if(cam)
 				cam.transform.Rotate(1, 0, 0);
+
+			uiCtrl.closeAllPanel();
 		}
 	}
 
