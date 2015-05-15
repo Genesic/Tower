@@ -34,6 +34,13 @@ public class CameraMove : MonoBehaviour {
 			// Get mouse origin
 			mouseOrigin = Input.mousePosition;
 			isPanning = true;
+
+			/*
+			RaycastHit hit;
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			if( Physics.Raycast(ray, out hit, Mathf.Infinity) )
+				Debug.Log (hit.transform.gameObject);
+			*/
 		}
 		
 		// Get the right mouse button

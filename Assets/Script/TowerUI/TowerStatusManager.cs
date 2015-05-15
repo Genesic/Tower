@@ -3,20 +3,16 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class TowerStatusManager : MonoBehaviour {
-	private StatusManager statusManager;
 	private CannonPlatform useCannon;
-	
+
+	public UIManager uiManager;
 	public Text ErrMessage;
 	public Text lvText;
 	public Text towertypeText;
 	public Text atkText;
 	public Text spdText;
+	public Text lvUpText;
 	public Text priceText;
-	
-	void Awake(){
-		GameObject Status = GameObject.Find("GameManager");
-		statusManager = Status.GetComponent<StatusManager> ();
-	}
 
 	public void set_useCannon(CannonPlatform selectCannon)
 	{
@@ -26,15 +22,32 @@ public class TowerStatusManager : MonoBehaviour {
 		atkText.text = " ATK : " + useCannon.getAtk;
 		spdText.text = " SPD : " + useCannon.getSpd;
 		priceText.text = " Sell : " + useCannon.getPrice + "G";
+		lvUpText.text = " LevelUp : " + useCannon.getCost + "G";
 	}
 
 	public void sell_tower(){
 		if (useCannon.IsEmpty)
 			return;
 
+		int price = useCannon.getPrice;
+		uiManager.statusManager.updateMoney(price);
 		useCannon.SellCannon();
 		close_panel ();
 
+	}
+
+	public void level_up_tower(){
+		if (useCannon.IsEmpty)
+			return;
+
+		int cost = useCannon.getCost ;
+		if (uiManager.statusManager.getMoney < cost) {
+			uiManager.errMsg.show_message ("Need More Money!!");
+		} else {
+			uiManager.statusManager.updateMoney (-cost);
+			useCannon.LevelUpCannon ();
+		}
+		close_panel ();
 	}
 
 	public void close_panel(){

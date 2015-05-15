@@ -7,13 +7,15 @@ public class CannonPlatform : MonoBehaviour
 {
     private static readonly Vector3 OFFSET = new Vector3(0f, 0.5f, 0f);
 
-    private ICannon mCannon = null;
+    // private ICannon mCannon = null;
+
+	private Tower use_tower = null;
 
     private Transform mTs = null;
 
     public Vector3 Position { get { return mTs.position + OFFSET; } }
 
-    public bool IsEmpty { get { return mCannon == null; } }
+    public bool IsEmpty { get { return use_tower == null; } }
     public bool HasCannon { get { return !IsEmpty; } }
 
     public string ID { get { return name; } }
@@ -22,11 +24,12 @@ public class CannonPlatform : MonoBehaviour
 	private UIManager uiManager;
 	private ErrMessage errMsg;
 
-    public int getLevel { get { return mCannon.Level; } }
-    public string getName { get { return mCannon.towerName; } }
-    public int getAtk { get { return mCannon.Damage; } }
-    public float getSpd { get { return mCannon.Speed; } }
-    public int getPrice { get { return mCannon.Price; } }
+	public int getLevel { get { return use_tower.Level; } }
+	public string getName { get { return use_tower.towerName; } }
+	public int getAtk { get { return use_tower.Damage; } }
+	public float getSpd { get { return use_tower.Speed; } }
+	public int getPrice { get { return use_tower.Price; } }
+	public int getCost { get { return use_tower.Cost; } }
 
     void Awake()
     {
@@ -44,7 +47,7 @@ public class CannonPlatform : MonoBehaviour
 		errMsg = uiManager.getErrMsg ();
     }
     /// <summary>檢查可否建置砲塔</summary>
-    public bool checkBuildCannon(ICannon cannon)
+    public bool checkBuildCannon(Tower check_tower)
     {
         if (HasCannon)
         {
@@ -52,26 +55,15 @@ public class CannonPlatform : MonoBehaviour
             Debug.LogErrorFormat("位置:{0} 已放置砲塔:{1}", name, ID);
             return false;
         }
-
-        int cost = cannon.Cost;
-        if (statusManager.getMoney < cost)
-        {
-            errMsg.show_message("Need More Money!!");
-            return false;
-        }
-
+		
         return true;
     }
 
     /// <summary>建置砲塔</summary>
-    public void BuildCannon(ICannon cannon)
+	public void BuildCannon(Tower check_tower)
     {
-        if (checkBuildCannon(cannon))
-        {
-            int cost = cannon.Cost;
-            statusManager.updateMoney(-cost);
-            mCannon = cannon;
-        }
+		if (checkBuildCannon(check_tower))
+			use_tower = check_tower;        
     }
 
 
@@ -84,11 +76,20 @@ public class CannonPlatform : MonoBehaviour
             return;
         }
 
-        int price = mCannon.Price;
-        statusManager.updateMoney(price);
-        mCannon.destroy();
-        mCannon = null;
+		use_tower.destroy();
+		use_tower = null;
     }
+
+	public void LevelUpCannon()
+	{
+		if (IsEmpty)
+		{
+			Debug.LogErrorFormat("位置:{0} 沒有砲塔可升級", name);
+			return;
+		}
+
+		use_tower.level_up();
+	}
 
 	void OnMouseDown() {
 		uiManager.setMouseDownCubePanel (this);

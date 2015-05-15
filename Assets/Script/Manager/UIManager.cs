@@ -5,6 +5,7 @@ public class UIManager : MonoBehaviour {
 
 	public Canvas canvas;
 	public ErrMessage errMsg;
+	public StatusManager statusManager;
 	public GameObject statusPanel;
 	public GameObject selectTowerPanel;
 	public GameObject TowerStatusPanel;
