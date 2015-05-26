@@ -68,6 +68,12 @@ public class SoundManager : MonoBehaviour
         return Resources.Load<AudioClip>(string.Format(SFX_PATH, id));
     }
 
+    [ContextMenu("PlaySound")]
+    public void Test_PlaySound()
+    {
+        PlaySound();
+    }
+
     #endregion
 
 }

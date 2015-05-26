@@ -9,6 +9,7 @@ public class MapManager : MonoBehaviour
     public Transform MonsterContainerTs = null;
     public Transform EffectContainerTs = null;
 	public Transform BulletContainerTs = null;
+    public Transform SnareContainerTs = null;
 
     void Awake()
     {
