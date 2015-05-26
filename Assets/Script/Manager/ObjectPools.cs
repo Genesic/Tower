@@ -52,12 +52,6 @@ public abstract class ObjectPools<T1, T2> : MonoSingleTon<T1>
     public abstract T2 CreateNew(string id);
 
 }
-//public interface IPool
-//{
-//    string ID { get; }
-//    void SetDisable();
-//    void SetEnable();
-//}
 
 public class IPool : MonoBehaviour
 {

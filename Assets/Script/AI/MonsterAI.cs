@@ -75,7 +75,7 @@ public abstract class MonsterAI : IPool
 
     private Dictionary<MonsterAction, System.Func<IEnumerator>> mMonsterActionDict = new Dictionary<MonsterAction, System.Func<IEnumerator>>();
 
-    protected virtual void Awake()
+    void Awake()
     {
         mTs = transform;
 
@@ -97,10 +97,6 @@ public abstract class MonsterAI : IPool
         mMonsterActionDict.Add(MonsterAction.Dance, DanceHandle);
     }
 
-    protected virtual void OnDestroy()
-    {
-
-    }
 
     protected virtual void Update()
     {

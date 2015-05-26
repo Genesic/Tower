@@ -88,6 +88,7 @@ public class GameManager : MonoSingleTon<GameManager>
         StatusMgr = GetComponent<StatusManager>();
 
         gameObject.AddComponent<EffectManager>();
+        gameObject.AddComponent<SnarePools>();
         gameObject.AddComponent<HUDManager>();
         CoreTarget = MapMgr.TargetTs.gameObject.AddComponent<BaseCore>();
         BaseHUD = UICanvas.GetComponent<HUD>();

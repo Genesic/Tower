@@ -3,9 +3,6 @@ using System.Collections;
 
 public class EffectSetting : IPool
 {
-    /*private string mID = string.Empty;
-    public string ID { get { return mID; } }
-    */
     private Transform mTs = null;
 
     void Awake()
