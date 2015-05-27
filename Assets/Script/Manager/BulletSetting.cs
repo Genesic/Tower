@@ -46,6 +46,7 @@ public class BulletSetting : IPool
     void OnTriggerEnter(Collider other)
     {
         //if (other.gameObject.layer == LayerMask.NameToLayer ("Monster")) {
+		Debug.Log ("trigger!!");
         Instantiate(explosion, transform.position, transform.rotation);
         SetDisable();
         BulletManager.Retrieve(this);

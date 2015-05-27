@@ -22,7 +22,9 @@ public class TowerStatusManager : MonoBehaviour {
 		atkText.text = " ATK : " + useCannon.getAtk;
 		spdText.text = " SPD : " + useCannon.getSpd;
 		priceText.text = " Sell : " + useCannon.getPrice + "G";
+		Debug.Log (useCannon.getCost);
 		lvUpText.text = " LevelUp : " + useCannon.getCost + "G";
+
 	}
 
 	public void sell_tower(){
