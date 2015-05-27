@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BulletManager : ObjectPools<BulletManager, BulletSetting> {
+public class BulletManager : ObjectPools<BulletManager, BulletBasic> {
 
 	protected override Transform ContainerTs { get { return mGameMgr.MapMgr.BulletContainerTs; } }
 
@@ -15,12 +15,12 @@ public class BulletManager : ObjectPools<BulletManager, BulletSetting> {
 		base.OnDestroy();
 	}
 	
-	public static void Retrieve(BulletSetting obj)
+	public static void Retrieve(BulletBasic obj)
 	{
 		Instance.InsRetrieve(obj);
 	}
 	
-	public override BulletSetting CreateNew(string id)
+	public override BulletBasic CreateNew(string id)
 	{
 		var path = string.Format("prefabs/Bullet/{0}", id);
 		var prefab = Resources.Load<GameObject>(path);
@@ -28,7 +28,7 @@ public class BulletManager : ObjectPools<BulletManager, BulletSetting> {
 		var bulletTs = bulletGo.transform;
 		bulletTs.SetParent(ContainerTs);
 
-		BulletSetting setting = bulletGo.GetComponent<BulletSetting> ();
+		BulletBasic setting = bulletGo.GetComponent<BulletBasic> ();
 		setting.SetParam (id);
 
 		return setting;

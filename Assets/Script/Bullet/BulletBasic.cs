@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BulletSetting : IPool
+public class BulletBasic : IPool
 {
     public GameObject explosion;
 
-	private int damage;
+	public int damage;
 
     private Transform mTs = null;
 
@@ -39,23 +39,19 @@ public class BulletSetting : IPool
         explosion = explosion_prefab;
     }
 
-	public void SetDamage(int value){
-		damage = value;
-	}
-
-    void OnTriggerEnter(Collider other)
-    {
-        //if (other.gameObject.layer == LayerMask.NameToLayer ("Monster")) {
-		Debug.Log ("trigger!!");
-        Instantiate(explosion, transform.position, transform.rotation);
-        SetDisable();
-        BulletManager.Retrieve(this);
-
+	public void onHit(Collider other)
+	{
+		Instantiate(explosion, transform.position, transform.rotation);
+		SetDisable();
+		BulletManager.Retrieve(this);
+		
 		if (other.gameObject.layer == LayerMask.NameToLayer ("Monster")) {
 			other.gameObject.GetComponent<MonsterAI> ().Damage (damage);
 		}
-        //} else {
-        //	Debug.Log ("trigger:"+other.gameObject);
-        //}
+	}
+
+    void OnTriggerEnter(Collider other)
+    {    
+		onHit (other);
     }
 }

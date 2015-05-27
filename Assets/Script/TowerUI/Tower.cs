@@ -7,6 +7,7 @@ public class Tower : MonoBehaviour, ICannon {
 	public int level;
 	public float searchRadius;
 	public CannonPlatform useCannon;
+	public string BulletType;
 	
 	private float nextFire;
 	private float startFire;
@@ -89,14 +90,14 @@ public class Tower : MonoBehaviour, ICannon {
 				Fort fort = fort_list[level];
 
 				nextFire = Time.time + fort.FireRate;
-				var Bullet = BulletPool.Obtain("basic");
+				var Bullet = BulletPool.Obtain(BulletType);
 				Bullet.SetPosition(ShotSpwan);
 				Bullet.SetRotation(transform.rotation);
 				Bullet.SetEnable();
 
 				Vector3 direction = (LockCollider.gameObject.transform.position - fort.transform.position).normalized;
 				Bullet.SetVelocity(direction, fort.Speed);
-				Bullet.SetDamage(fort.Damage);
+				Bullet.damage = fort.Damage;
 				//LockCollider.gameObject.GetComponent<MonsterAI>().Damage(damage);
 			}
 		}
@@ -121,6 +122,7 @@ public class Tower : MonoBehaviour, ICannon {
 	}
 
 	void OnMouseDown(){
+		Debug.Log ("mouseDown!!");
 		uiManager.setMouseDownTowerPanel (useCannon);
 	}
 
