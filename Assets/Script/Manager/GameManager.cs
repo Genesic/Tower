@@ -9,6 +9,10 @@ public class GameManager : MonoSingleTon<GameManager>
 {
     #region Field
 
+    [SerializeField]
+    private bool m_UseSnare = true;
+    public bool UseSnare { get { return m_UseSnare; } }
+
     public MapManager MapMgr { get; private set; }
 
     public EnemySpawnManager EnemySpawnMgr { get; private set; }

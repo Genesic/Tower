@@ -75,6 +75,8 @@ public abstract class MonsterAI : IPool
 
     private Dictionary<MonsterAction, System.Func<IEnumerator>> mMonsterActionDict = new Dictionary<MonsterAction, System.Func<IEnumerator>>();
 
+    private BuffSystem mBuffSystem = new BuffSystem();
+
     void Awake()
     {
         mTs = transform;
@@ -87,6 +89,8 @@ public abstract class MonsterAI : IPool
         mAttackSmb = mAni.GetBehaviour<AttackSmb>();
         mAttackSmb.MonsterAI = this;
 
+        mBuffSystem.OnMoveSpeedChanged += OnBuffMoveSpeedChanged;
+
         StatusMgr = GameManager.Instance.StatusMgr;
 
         mMonsterActionDict.Add(MonsterAction.Spawn, SpawnHandle);
@@ -97,9 +101,15 @@ public abstract class MonsterAI : IPool
         mMonsterActionDict.Add(MonsterAction.Dance, DanceHandle);
     }
 
+    void OnDestroy()
+    {
+        mBuffSystem.OnMoveSpeedChanged -= OnBuffMoveSpeedChanged;
+    }
 
     protected virtual void Update()
     {
+        mBuffSystem.Update();
+
         if (Input.GetKeyDown(KeyCode.Keypad1)) SetMonsterAction(MonsterAction.Spawn);
         if (Input.GetKeyDown(KeyCode.Keypad2)) SetMonsterAction(MonsterAction.Idle);
         if (Input.GetKeyDown(KeyCode.Keypad3)) SetMonsterAction(MonsterAction.Move);
@@ -128,9 +138,17 @@ public abstract class MonsterAI : IPool
         mMonsterHUD = null;
     }
 
+    private void OnBuffMoveSpeedChanged(float moveSpeed)
+    {
+        mAgent.speed = m_UseParam.MoveSpeed * mBuffSystem.MoveSpeed;
+        //Debug.Log("moveSpeed:" + moveSpeed + " mAgent.speed:" + mAgent.speed);
+    }
+
     private void InitParam()
     {
         m_UseParam.SetTo(m_OriginParam);
+
+        mBuffSystem.Init(m_UseParam);
 
         mAgent.speed = m_UseParam.MoveSpeed;
 
@@ -200,6 +218,13 @@ public abstract class MonsterAI : IPool
     public int getHp()
     {
         return m_UseParam.HP;
+    }
+
+    public void Damage(int damage, BuffData buffData)
+    {
+        mBuffSystem.ApplyBuff(buffData);
+
+        Damage(damage);
     }
 
     public void Damage(int damage)

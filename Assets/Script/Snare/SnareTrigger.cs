@@ -31,7 +31,7 @@ public class SnareTrigger : MonoBehaviour
                 mStartupEffectGo = Instantiate<GameObject>(m_StartupEffectPrefab);
                 var ts = mStartupEffectGo.transform;
                 ts.SetParent(transform);
-                ts.localPosition = new Vector3(0f, 0.1f, 0f);
+                ts.localPosition = new Vector3(0f, 0.3f, 0f);
                 ts.localRotation = Quaternion.identity;
             }
 
@@ -41,7 +41,10 @@ public class SnareTrigger : MonoBehaviour
 
     void Awake()
     {
-        StartupReady();
+        if (GameManager.Instance == null || GameManager.Instance.UseSnare)
+            Startup();
+        else
+            Stop();
     }
 
     void OnTriggerEnter(Collider other)
@@ -60,44 +63,30 @@ public class SnareTrigger : MonoBehaviour
         TriggerSnare();
     }
 
-    //void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.red;
-    //    Gizmos.DrawWireCube(transform.position, m_BoxCD.size * 2f);
-    //}
-
-    private void StartupReady()
+    private void TriggerSnare()
     {
         Stop();
-        StartCoroutine(CoStartupReady());
-    }
 
-    private IEnumerator CoStartupReady()
-    {
-        yield return new WaitForSeconds(m_StartupTime);
+        Countdown();
 
-        Startup();
+        SendEvent();
     }
 
     private void Startup()
     {
-        m_BoxCD.enabled = true;
-
-        PlayIdleEffect(true);
+        StartupDetect(true);
     }
 
     private void Stop()
     {
-        m_BoxCD.enabled = false;
-
-        PlayIdleEffect(false);
+        StartupDetect(false);
     }
 
-    private void TriggerSnare()
+    private void StartupDetect(bool startup)
     {
-        StartupReady();
+        m_BoxCD.enabled = startup;
 
-        SendEvent();
+        PlayIdleEffect(startup);
     }
 
     private void SendEvent()
@@ -106,6 +95,18 @@ public class SnareTrigger : MonoBehaviour
         {
             ExecuteEvents.Execute<ISnareEvent>(listenerGo, null, (x, y) => x.OnSnareTrigger());
         }
+    }
+
+    private void Countdown()
+    {
+        StartCoroutine(CoCountdown());
+    }
+
+    private IEnumerator CoCountdown()
+    {
+        yield return new WaitForSeconds(m_StartupTime);
+
+        Startup();
     }
 
     private void PlayIdleEffect(bool _active)
@@ -126,4 +127,11 @@ public class SnareTrigger : MonoBehaviour
         Enter,
         Exit
     }
+
+    //void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.red;
+    //    Gizmos.DrawWireCube(transform.position, m_BoxCD.size * 2f);
+    //}
+
 }

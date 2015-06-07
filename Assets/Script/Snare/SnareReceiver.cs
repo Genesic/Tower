@@ -9,7 +9,6 @@ public abstract class SnareReceiver : MonoBehaviour, ISnareEvent
 
     protected abstract string EmitObjectID { get; }
 
-
     protected virtual void Awake() { }
 
     public abstract void OnSnareTrigger();

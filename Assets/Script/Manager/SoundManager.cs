@@ -26,12 +26,18 @@ public class SoundManager : MonoBehaviour
 
     private void PlaySound()
     {
+        StopSound();
+
         mCoroutine = StartCoroutine(CoPlaySound());
     }
 
     private void StopSound()
     {
-        StopCoroutine(mCoroutine);
+        if (mCoroutine !=null)
+        {
+            StopCoroutine(mCoroutine);
+            mCoroutine = null;
+        }
     }
 
     private IEnumerator CoPlaySound()
