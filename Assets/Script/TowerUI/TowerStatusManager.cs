@@ -14,6 +14,8 @@ public class TowerStatusManager : MonoBehaviour {
 	public Text lvUpText;
 	public Text priceText;
 
+	public Button lvUpButtom;
+
 	public void set_useCannon(CannonPlatform selectCannon)
 	{
 		useCannon = selectCannon;
@@ -22,8 +24,13 @@ public class TowerStatusManager : MonoBehaviour {
 		atkText.text = " ATK : " + useCannon.getAtk;
 		spdText.text = " SPD : " + useCannon.getSpd;
 		priceText.text = " Sell : " + useCannon.getPrice + "G";
-		Debug.Log (useCannon.getCost);
-		lvUpText.text = " LevelUp : " + useCannon.getCost + "G";
+		if (useCannon.getLevel == useCannon.getMaxLevel) {
+			lvUpText.text = " max level";
+			lvUpButtom.interactable = false;
+		} else {
+			lvUpText.text = " LevelUp : " + useCannon.getCost + "G";
+			lvUpButtom.interactable = true;
+		}
 
 	}
 
@@ -43,13 +50,15 @@ public class TowerStatusManager : MonoBehaviour {
 			return;
 
 		int cost = useCannon.getCost ;
-		if (uiManager.statusManager.getMoney < cost) {
-			uiManager.errMsg.show_message ("Need More Money!!");
-		} else {
-			uiManager.statusManager.updateMoney (-cost);
-			useCannon.LevelUpCannon ();
+		if (useCannon.getLevel < useCannon.getMaxLevel) {
+			if (uiManager.statusManager.getMoney < cost) {
+				uiManager.errMsg.show_message ("Need More Money!!");
+			} else {
+				uiManager.statusManager.updateMoney (-cost);
+				useCannon.LevelUpCannon ();
+			}
+			close_panel ();
 		}
-		close_panel ();
 	}
 
 	public void close_panel(){

@@ -30,6 +30,7 @@ public class CannonPlatform : MonoBehaviour
 	public float getSpd { get { return use_tower.Speed; } }
 	public int getPrice { get { return use_tower.Price; } }
 	public int getCost { get { return use_tower.Cost; } }
+	public int getMaxLevel { get { return use_tower.maxLevel; } }
 
     void Awake()
     {

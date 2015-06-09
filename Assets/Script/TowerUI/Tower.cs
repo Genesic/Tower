@@ -15,10 +15,18 @@ public class Tower : MonoBehaviour, ICannon {
 
 	public float Speed { get { return fort_list[level].Speed;}  }
 	public int Damage { get { return fort_list[level].Damage;}  }
-	public int Cost { get {	return fort_list[level+1].Cost; } }
+	public int Cost { get {	
+			if( level+1 > maxLevel ){
+				return 0;
+			} else {
+				return fort_list[level+1].Cost; 
+			}
+		} 
+	}
 	public int Price { get {return fort_list[level].Price;} }
 	public int Level { get { return level; } }
 	public string towerName { get { return fort_list[level].towerName; } }
+	public int maxLevel { get { return fort_list.Length -1;	} }
 
 	private MonsterAI lockMonster;
 	public Fort[] fort_list;

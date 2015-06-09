@@ -41,19 +41,17 @@ public class BulletBasic : IPool
 
 	public void onHit(Collider other)
 	{
-		Instantiate(explosion, transform.position, transform.rotation);
 		SetDisable();
 		BulletManager.Retrieve(this);
-		
-		if (other.gameObject.layer == LayerMask.NameToLayer ("Monster")) {
 
-            //一般無 buff 攻擊
-            //other.gameObject.GetComponent<MonsterAI> ().Damage (damage);
-            
-            //帶 緩速(維持3秒，速度為原來的30%) 攻擊
-            var damageAppendBuff = new BuffData(BuffType.MoveSpeed, 3f, 0.3f);
-            other.gameObject.GetComponent<MonsterAI>().Damage(damage, damageAppendBuff);
+		if (other.gameObject.layer == LayerMask.NameToLayer ("Monster")) {
+			setDamage (other);
 		}
+	}
+
+	public virtual void setDamage(Collider other){
+		Instantiate(explosion, transform.position, transform.rotation);
+		other.gameObject.GetComponent<MonsterAI> ().Damage (damage);
 	}
 
     void OnTriggerEnter(Collider other)
