@@ -15,6 +15,8 @@ public class GameManager : MonoSingleTon<GameManager>
 
     public MapManager MapMgr { get; private set; }
 
+	public HeroManager HeroMgr { get; private set; }
+
     public EnemySpawnManager EnemySpawnMgr { get; private set; }
 
     public SoundManager SoundMgr { get; private set; }
@@ -87,6 +89,7 @@ public class GameManager : MonoSingleTon<GameManager>
     /// <summary>初始化元件</summary>
     private void InitComponent()
     {
+		HeroMgr = GetComponent<HeroManager>();
         EnemySpawnMgr = GetComponent<EnemySpawnManager>();
         SoundMgr = GetComponent<SoundManager>();
         StatusMgr = GetComponent<StatusManager>();
@@ -166,9 +169,10 @@ public class GameManager : MonoSingleTon<GameManager>
 
     void OnGUI()
     {
-        if (GUILayout.Button("產生單隻怪物")) EnemySpawnMgr.SpawnEnemy();
-        if (GUILayout.Button("怪物腳本開始")) EnemySpawnMgr.StartSpawnEnemy();
-        if (GUILayout.Button("讓怪物全死亡")) EnemySpawnMgr.MonsterAllDie();
+        if (GUILayout.Button("產生單隻怪物"))		EnemySpawnMgr.SpawnEnemy();
+        if (GUILayout.Button("怪物腳本開始")) 	EnemySpawnMgr.StartSpawnEnemy();
+        if (GUILayout.Button("讓怪物全死亡"))		EnemySpawnMgr.MonsterAllDie();
+		if (GUILayout.Button ("切換控制"))		HeroMgr.CreateHero ();
     }
 
     void Update()
