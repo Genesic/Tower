@@ -31,7 +31,8 @@ public class BulletBasic : IPool
 
     public void SetVelocity(Vector3 direction, float speed)
     {
-        GetComponent<Rigidbody>().velocity = direction * speed;
+		if( GetComponent<Rigidbody>() )
+        	GetComponent<Rigidbody>().velocity = direction * speed;
     }
 
     public void SetExplosion(GameObject explosion_prefab)

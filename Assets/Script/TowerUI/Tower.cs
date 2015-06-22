@@ -8,6 +8,7 @@ public class Tower : MonoBehaviour, ICannon {
 	public float searchRadius;
 	public CannonPlatform useCannon;
 	public string BulletType;
+	public BulletBasic bullet;
 	
 	private float nextFire;
 	private float startFire;
@@ -91,24 +92,59 @@ public class Tower : MonoBehaviour, ICannon {
 			}
 		}
 
+		// 根據等級取得目前砲台資料
+		Fort fort = fort_list [level];
+
 		if (LockIdx >= 0) {
 			Collider LockCollider = hitColliders [LockIdx];
-			if (Time.time > nextFire && Time.time > startFire) {
-				// 根據等級取得目前砲台資料
-				Fort fort = fort_list[level];
+			// 射出型子彈
+			if (fort.Speed > 0) {
+				if (Time.time > nextFire && Time.time > startFire) {
+					nextFire = Time.time + fort.FireRate;
+					/*
+					var Bullet = BulletPool.Obtain(BulletType);
+					Bullet.SetPosition(ShotSpwan);
+					Bullet.SetRotation(transform.rotation);
+					Bullet.SetEnable();
 
-				nextFire = Time.time + fort.FireRate;
-				var Bullet = BulletPool.Obtain(BulletType);
-				Bullet.SetPosition(ShotSpwan);
-				Bullet.SetRotation(transform.rotation);
-				Bullet.SetEnable();
+					Vector3 direction = (LockCollider.gameObject.transform.position - fort.transform.position).normalized;
+					Bullet.SetVelocity(direction, fort.Speed);
+					Bullet.damage = fort.Damage;
+					*/
+					//LockCollider.gameObject.GetComponent<MonsterAI>().Damage(damage);
+					createBullet (LockCollider, fort);
+				}
+			// 持續特效型子彈
+			} else {
+				if( bullet == null )
+					bullet = createBullet (LockCollider, fort);
 
-				Vector3 direction = (LockCollider.gameObject.transform.position - fort.transform.position).normalized;
-				Bullet.SetVelocity(direction, fort.Speed);
-				Bullet.damage = fort.Damage;
-				//LockCollider.gameObject.GetComponent<MonsterAI>().Damage(damage);
+				bullet.SetPosition(ShotSpwan);
+				if (Time.time > nextFire && Time.time > startFire) {
+					nextFire = Time.time + fort.FireRate;
+					bullet.setDamage(LockCollider);
+				}
+			}
+		} else {
+			if( fort.Speed == 0 && bullet != null ){
+				bullet.SetDisable();
+				BulletManager.Retrieve(bullet);
+				bullet = null;
 			}
 		}
+	}
+
+	BulletBasic createBullet(Collider LockCollider, Fort fort){
+		var Bullet = BulletPool.Obtain(BulletType);
+		Bullet.SetPosition(ShotSpwan);
+		Bullet.SetRotation(transform.rotation);
+		Bullet.SetEnable();
+		
+		Vector3 direction = (LockCollider.gameObject.transform.position - fort.transform.position).normalized;
+		Bullet.SetVelocity(direction, fort.Speed);
+		Bullet.damage = fort.Damage;
+
+		return Bullet;
 	}
 
 	void FixedUpdate() {
@@ -125,6 +161,8 @@ public class Tower : MonoBehaviour, ICannon {
 		Vector3 targetDir = lockMonster.transform.position - fort.transform.position;
 		Vector3 newDir = Vector3.RotateTowards( fort.transform.forward, targetDir, 0.05F, 0.0F );				
 		fort.transform.rotation = Quaternion.LookRotation(newDir);
+		if (bullet != null)
+			bullet.SetRotation (Quaternion.LookRotation (newDir));
 		
 		ShotSpwan = fort.transform.position + new Vector3(0.0F , 0.5f + level/10 , 0.0F );
 	}
