@@ -110,6 +110,10 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
 
     private Vector3 GetSpawnPosition()
     {
+        //return new Vector3(9f, 1f, -4f);
+        //return new Vector3(45f, 12f, -5f);
+        //return new Vector3(8f, 2f, 25f);
+
         var origin = SpawnTs.position;
         var randomPos = SpawnTs.rotation * new Vector3(Random.Range(-m_SpawnOffset.x, m_SpawnOffset.x), 0f, Random.Range(-m_SpawnOffset.y, m_SpawnOffset.y));
 

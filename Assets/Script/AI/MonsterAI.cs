@@ -77,6 +77,8 @@ public abstract class MonsterAI : IPool
 
     private BuffSystem mBuffSystem = new BuffSystem();
 
+    private Rigidbody mRigid = null;
+
     void Awake()
     {
         mTs = transform;
@@ -84,6 +86,7 @@ public abstract class MonsterAI : IPool
         mID = m_MonsterID;
 
         mAgent = GetComponent<NavMeshAgent>();
+        mRigid = GetComponent<Rigidbody>();
 
         mAni = GetComponentInChildren<Animator>();
         mAttackSmb = mAni.GetBehaviour<AttackSmb>();
@@ -91,7 +94,8 @@ public abstract class MonsterAI : IPool
 
         mBuffSystem.OnMoveSpeedChanged += OnBuffMoveSpeedChanged;
 
-        StatusMgr = GameManager.Instance.StatusMgr;
+        if (GameManager.Instance != null)
+            StatusMgr = GameManager.Instance.StatusMgr;
 
         mMonsterActionDict.Add(MonsterAction.Spawn, SpawnHandle);
         mMonsterActionDict.Add(MonsterAction.Idle, IdleHandle);
@@ -151,6 +155,12 @@ public abstract class MonsterAI : IPool
         mBuffSystem.Init(m_UseParam);
 
         mAgent.speed = m_UseParam.MoveSpeed;
+        //mAgent.speed = Random.Range(10f, 20f);
+        mAgent.enabled = true;
+
+        mRigid.velocity = Vector3.zero;
+        mRigid.angularVelocity = Vector3.zero;
+        mRigid.useGravity = false;
 
         mAttackPoint = Vector3.zero;
 
@@ -194,7 +204,11 @@ public abstract class MonsterAI : IPool
 
     protected void FollowEnd()
     {
-        mAgent.Stop();
+        if (mAgent.enabled)
+        {
+            mAgent.Stop();
+            mAgent.enabled = false;
+        }
     }
 
     public void SetPosition(Vector3 position)
@@ -231,12 +245,24 @@ public abstract class MonsterAI : IPool
     {
         m_UseParam.HP = Mathf.Max(0, m_UseParam.HP - damage);
 
-        mMonsterHUD.SetHealth(GetPercentHP());
+        if (mMonsterHUD != null)
+            mMonsterHUD.SetHealth(GetPercentHP());
 
         if (IsDeath)
         {
             SetMonsterAction(MonsterAction.Death);
         }
+    }
+    
+    public void CollisionHit(int damage, float exForce, Vector3 exPoint, float exRadius, float upwards)
+    {
+        if (IsDeath)
+            return;
+
+        Damage(damage);
+
+        mRigid.AddExplosionForce(exForce, exPoint, exRadius, upwards, ForceMode.VelocityChange);
+        mRigid.useGravity = true;
     }
 
     private float GetPercentHP()
