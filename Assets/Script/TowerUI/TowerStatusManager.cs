@@ -28,7 +28,9 @@ public class TowerStatusManager : MonoBehaviour {
 			lvUpText.text = " max level";
 			lvUpButtom.interactable = false;
 		} else {
+			Debug.Log ("cost:"+useCannon.getCost);
 			lvUpText.text = " LevelUp : " + useCannon.getCost + "G";
+			Debug.Log ("lvcUpButtom:"+lvUpButtom);
 			lvUpButtom.interactable = true;
 		}
 
