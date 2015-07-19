@@ -12,7 +12,7 @@ public abstract class MonsterAI : IPool
     public static readonly int WALK_HASH = Animator.StringToHash("walk");
 
     protected string RebornEffect { get { return "MagicAuras/Prefabs/Shadow/GroundShadow"; } }
-    protected bool IsAlive { get { return m_UseParam.HP > 0; } }
+    public bool IsAlive { get { return m_UseParam.HP > 0; } }
     protected bool IsDeath { get { return !IsAlive; } }
 
     private AudioSource mAudio = null;
@@ -309,6 +309,9 @@ public abstract class MonsterAI : IPool
     protected IEnumerator IdleHandle()
     {
         SetAnimTrigger(MonsterAI.IDLE_HASH);
+
+        while (GameManager.Instance.GameState != GameManager.State.Start)
+            yield return null;
 
         SetMonsterAction(MonsterAction.Move);
 

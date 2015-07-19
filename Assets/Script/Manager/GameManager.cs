@@ -47,6 +47,12 @@ public class GameManager : MonoSingleTon<GameManager>
     private Tween<Vector3> mMoveCamTweenPos = null;
     private Tween<Vector3> mMoveCamTweenRot = null;
 
+    private CameraAnim mCameraAnim = null;
+
+    [SerializeField]
+    private State mState = State.Ready;
+    public State GameState { get { return mState; } }
+
     #endregion
 
     #region Unity Event
@@ -57,6 +63,7 @@ public class GameManager : MonoSingleTon<GameManager>
 
         MoveCamTs = GameObject.Find("MoveCamera").transform;
         MainCamTs = MoveCamTs.GetComponentInChildren<Camera>().transform;
+        mCameraAnim = MoveCamTs.GetComponent<CameraAnim>();
 
         LoadStage();
     }
@@ -106,6 +113,8 @@ public class GameManager : MonoSingleTon<GameManager>
         yield return new WaitForSeconds(1f);
 
         DynamicGI.UpdateEnvironment();
+
+        mCameraAnim.PlayIntroAnim();
     }
 
     #endregion
@@ -134,14 +143,19 @@ public class GameManager : MonoSingleTon<GameManager>
         mCameraTween.SetMode(TweenGroupMode.Concurrent);
         mCameraTween.AppendTween(mMoveCamTweenPos, mMoveCamTweenRot);
     }
+    
+    public void StartGame()
+    {
+        mState = State.Start;
+
+        EnemySpawnMgr.StartSpawnEnemy(5f);
+    }
 
     public void LookAtNearestMonster()
     {
         var monster = EnemySpawnMgr.GetCloseToBaseMonster();
         if (monster == null)
-        {
             return;
-        }
 
         var monsterTs = monster.transform;
         var monsterPos = monsterTs.position;
@@ -169,10 +183,10 @@ public class GameManager : MonoSingleTon<GameManager>
 
     void OnGUI()
     {
-        if (GUILayout.Button("產生單隻怪物"))		EnemySpawnMgr.SpawnEnemy();
-        if (GUILayout.Button("怪物腳本開始")) 	EnemySpawnMgr.StartSpawnEnemy();
-        if (GUILayout.Button("讓怪物全死亡"))		EnemySpawnMgr.MonsterAllDie();
-		if (GUILayout.Button ("切換控制"))		HeroMgr.CreateHero ();
+        if (GUILayout.Button("產生單隻怪物")) EnemySpawnMgr.SpawnEnemy(MapMgr.SpawnTs.position);
+        if (GUILayout.Button("怪物腳本開始")) EnemySpawnMgr.StartSpawnEnemy();
+        if (GUILayout.Button("讓怪物全死亡")) EnemySpawnMgr.MonsterAllDie();
+        if (GUILayout.Button("切換控制")) HeroMgr.CreateHero();
     }
 
     void Update()
@@ -196,4 +210,11 @@ public class GameManager : MonoSingleTon<GameManager>
 
     #endregion
 
+
+    public enum State
+    {
+        Ready,
+        Start,
+        End
+    }
 }

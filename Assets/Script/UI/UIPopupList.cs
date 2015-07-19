@@ -25,7 +25,7 @@ public class UIPopupList : MonoBehaviour
 
     [SerializeField]
     private Image m_WholeImg;
-    
+
     [SerializeField]
     private Scrollbar m_Scrollbar;
 
@@ -42,13 +42,10 @@ public class UIPopupList : MonoBehaviour
     private float m_DropSpeed = 0.1f;
 
     private bool mIsExpand = false;
-    private bool IsExpand {
+    private bool IsExpand
+    {
         get { return mIsExpand; }
-        set
-        {
-            mIsExpand = value;
-            
-        }
+        set { mIsExpand = value; }
     }
 
     private TweenGroup mTweenGroup = new TweenGroup();
@@ -71,7 +68,7 @@ public class UIPopupList : MonoBehaviour
 
     void Start()
     {
-        
+
     }
 
     void OnDestroy()

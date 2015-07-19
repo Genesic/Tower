@@ -42,13 +42,15 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
         base.OnDestroy();
     }
 
-    public void StartSpawnEnemy()
+    public void StartSpawnEnemy(float delay = 0f)
     {
-        mSpwanCoroutine = StartCoroutine(CoStartSpawnEnemy());
+        mSpwanCoroutine = StartCoroutine(CoStartSpawnEnemy(delay));
     }
 
-    private IEnumerator CoStartSpawnEnemy()
+    private IEnumerator CoStartSpawnEnemy(float delay)
     {
+        yield return new WaitForSeconds(delay);
+
         while (true)
         {
             SpawnMultiEnemy();
@@ -62,13 +64,34 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
         int num = Random.Range(m_SpawnNumMin, m_SpawnNumMax);
 
         for (int i = 0; i < num; i++)
-            SpawnEnemy();
+            SpawnEnemy(GetSpawnRandomPosition());
     }
 
-    public void SpawnEnemy()
+    public void SpawnIntroEnemy()
+    {
+        Debug.Log("SpawnIntroEnemy");
+
+        var origin = SpawnTs.position;
+        var xInterval = 1.5f;
+        var yInterval = 3f;
+        var count = 5;
+        var half = Mathf.FloorToInt(count / 2);
+
+        for (int x = 0; x < count; x++)
+        {
+            for (int z = 0; z < count; z++)
+            {
+                var pos = new Vector3((x - half) * xInterval, 0f, (z - half) * yInterval);
+                var spawnPos = origin + SpawnTs.rotation * pos;
+                SpawnEnemy(spawnPos);
+            }
+        }
+    }
+
+    public void SpawnEnemy(Vector3 pos)
     {
         var monsterAI = m_MonsterPools.Obtain("tufu");
-        monsterAI.SetPosition(GetSpawnPosition());
+        monsterAI.SetPosition(pos);
         monsterAI.SetRotation(SpawnTs.rotation);
         monsterAI.SetEnable();
         monsterAI.SetTarget(TargetTs);
@@ -85,7 +108,8 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
 
         foreach (var monster in mAliveMonsterQueue)
         {
-            list.Add(new MonsterPathData { Monster = monster, RemainDistance = monster.RemainDistance });
+            if (monster.IsAlive)
+                list.Add(new MonsterPathData { Monster = monster, RemainDistance = monster.RemainDistance });
         }
 
         var result = list.OrderBy(data => data.RemainDistance);
@@ -108,7 +132,7 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
         }
     }
 
-    private Vector3 GetSpawnPosition()
+    private Vector3 GetSpawnRandomPosition()
     {
         //return new Vector3(9f, 1f, -4f);
         //return new Vector3(45f, 12f, -5f);

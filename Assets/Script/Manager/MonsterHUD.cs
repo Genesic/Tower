@@ -27,6 +27,11 @@ public class MonsterHUD : UIFollow
         ResetData();
     }
 
+    protected override void Update()
+    {
+        m_Health.gameObject.SetActive(GameManager.Instance.GameState == GameManager.State.Start);
+    }
+
     public void SetTarget(Transform target)
     {
         mTarget = target;

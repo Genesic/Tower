@@ -36,6 +36,11 @@ public abstract class UIFollow : IPool
         mRTS = transform as RectTransform;
     }
 
+    protected virtual void Update()
+    {
+
+    }
+
     protected virtual void LateUpdate()
     {
         if (mCanvasRTs == null || mTarget == null || mWorldCam == null || mRTS == null)
