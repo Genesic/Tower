@@ -30,6 +30,8 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
 
     private Queue<MonsterAI> mAliveMonsterQueue = new Queue<MonsterAI>();
 
+    public int MonsterAliveNum { get { return mAliveMonsterQueue.Count; } }
+
     protected override void Awake()
     {
         base.Awake();
@@ -69,8 +71,6 @@ public class EnemySpawnManager : MonoSingleTon<EnemySpawnManager>
 
     public void SpawnIntroEnemy()
     {
-        Debug.Log("SpawnIntroEnemy");
-
         var origin = SpawnTs.position;
         var xInterval = 1.5f;
         var yInterval = 3f;

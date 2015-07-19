@@ -72,6 +72,11 @@ public class GameManager : MonoSingleTon<GameManager>
     {
         base.OnDestroy();
     }
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape)) SkipIntroAnim();
+        if (Input.GetKeyDown(KeyCode.Alpha1)) LookAtNearestMonster();
+    }
 
     #endregion
 
@@ -115,6 +120,15 @@ public class GameManager : MonoSingleTon<GameManager>
         DynamicGI.UpdateEnvironment();
 
         mCameraAnim.PlayIntroAnim();
+    }
+
+    #endregion
+
+    #region Other
+
+    private void SkipIntroAnim()
+    {
+        mCameraAnim.SkipIntroAnim();
     }
 
     #endregion
@@ -189,19 +203,6 @@ public class GameManager : MonoSingleTon<GameManager>
         if (GUILayout.Button("切換控制")) HeroMgr.CreateHero();
     }
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) LookAtNearestMonster();
-
-        //if (Input.GetKeyDown(KeyCode.Alpha1)) EnemySpawnMgr.SpawnEnemy();
-        /*if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            var point = MapMgr.TargetTs.position + MathUtility.GetRandomRadiusPoint(4f);
-
-            Debug.DrawLine(MapMgr.TargetTs.position, point, Color.red, 1f);
-        }*/
-    }
-
     /*void OnDrawGizmos()
     {
         Gizmos.color = Color.green;
@@ -210,6 +211,7 @@ public class GameManager : MonoSingleTon<GameManager>
 
     #endregion
 
+    #region 資料結構
 
     public enum State
     {
@@ -217,4 +219,6 @@ public class GameManager : MonoSingleTon<GameManager>
         Start,
         End
     }
+
+    #endregion
 }
