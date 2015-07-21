@@ -31,6 +31,11 @@ public class SoundManager : MonoBehaviour
         mCoroutine = StartCoroutine(CoPlaySound());
     }
 
+    public void SetVolume(float volume)
+    {
+        m_AudioSource.volume = volume;
+    }
+
     private void StopSound()
     {
         if (mCoroutine !=null)

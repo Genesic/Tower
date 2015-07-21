@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using DaikonForge.Tween;
 using DaikonForge.Tween.Interpolation;
+using System.Collections.Generic;
 
 /// <summary>遊戲管理類別</summary>
 public class GameManager : MonoSingleTon<GameManager>
@@ -12,6 +13,13 @@ public class GameManager : MonoSingleTon<GameManager>
     [SerializeField]
     private bool m_UseSnare = true;
     public bool UseSnare { get { return m_UseSnare; } }
+
+    [SerializeField]
+    private UIPopupList m_UIPopupList = null;
+
+    [SerializeField]
+    private State mState = State.Ready;
+    public State GameState { get { return mState; } }
 
     public MapManager MapMgr { get; private set; }
 
@@ -48,10 +56,6 @@ public class GameManager : MonoSingleTon<GameManager>
     private Tween<Vector3> mMoveCamTweenRot = null;
 
     private CameraAnim mCameraAnim = null;
-
-    [SerializeField]
-    private State mState = State.Ready;
-    public State GameState { get { return mState; } }
 
     #endregion
 
@@ -104,6 +108,8 @@ public class GameManager : MonoSingleTon<GameManager>
 		HeroMgr = GetComponent<HeroManager>();
         EnemySpawnMgr = GetComponent<EnemySpawnManager>();
         SoundMgr = GetComponent<SoundManager>();
+        //SoundMgr.SetVolume(0f);
+
         StatusMgr = GetComponent<StatusManager>();
 
         gameObject.AddComponent<EffectManager>();
@@ -111,7 +117,17 @@ public class GameManager : MonoSingleTon<GameManager>
         gameObject.AddComponent<HUDManager>();
         CoreTarget = MapMgr.TargetTs.gameObject.AddComponent<BaseCore>();
         BaseHUD = UICanvas.GetComponent<HUD>();
+        
+        m_UIPopupList.SetItems(new List<string> { "陷阱一", "陷阱二", "陷阱三", "陷阱四", "陷阱五", "陷阱六", "陷阱七", "陷阱八" });
     }
+
+    /*private void CreateUIPopupList()
+    {
+        var ui = Instantiate< GameObject>(Resources.Load<GameObject>("UI/UIPopupList"));
+        var uiRTS = ui.transform as RectTransform;
+        uiRTS.SetParent(m_UICanvas.transform, false);
+        uiRTS.anchoredPosition = new Vector2(-200f, 0f);
+    }*/
 
     private IEnumerator UpdateEnvironment()
     {
