@@ -65,15 +65,18 @@ public class UIPopupList : MonoBehaviour
 
         SetExpendBtnText(m_ItemList.Count > 0 ? m_ItemList[0] : "-----");
     }
-
-    void Start()
-    {
-
-    }
-
+    
     void OnDestroy()
     {
         m_ExpandBtn.onClick.RemoveListener(OnSwitch);
+    }
+
+    public void SetItems(List<string> items)
+    {
+        m_ItemList = items;
+
+        if (m_ItemList.Count > 0)
+            SetExpendBtnText(m_ItemList[0]);
     }
 
     private void OnSwitch()
