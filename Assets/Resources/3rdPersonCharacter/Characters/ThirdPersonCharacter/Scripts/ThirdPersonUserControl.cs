@@ -4,6 +4,8 @@ using UnityStandardAssets.CrossPlatformInput;
 
 namespace UnityStandardAssets.Characters.ThirdPerson
 {
+
+
     [RequireComponent(typeof (ThirdPersonCharacter))]
     public class ThirdPersonUserControl : MonoBehaviour
     {
@@ -13,7 +15,10 @@ namespace UnityStandardAssets.Characters.ThirdPerson
         private Vector3 m_Move;
         private bool m_Jump;                      // the world-relative desired move direction, calculated from the camForward and user input.
 
-        
+		public Animator ani;
+		static int groundedState = Animator.StringToHash("Grounded");
+		static int attackState = Animator.StringToHash("Attack");
+
         private void Start()
         {
             // get the transform of the main camera
@@ -39,6 +44,9 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             {
                 m_Jump = CrossPlatformInputManager.GetButtonDown("Jump");
             }
+
+			this.HeroAttack();
+
         }
 
 
@@ -71,5 +79,32 @@ namespace UnityStandardAssets.Characters.ThirdPerson
             m_Character.Move(m_Move, crouch, m_Jump);
             m_Jump = false;
         }
+
+		public void HeroAttack()
+		{
+			if (Input.GetKey(KeyCode.R)) 
+			{
+				ani.SetBool("Dance", true);
+			}
+			else if (Input.GetKey(KeyCode.K)) 
+			{
+					ani.SetBool("Kick", true);
+			}
+			else if (Input.GetKey(KeyCode.P)) 
+			{
+				ani.SetBool("Punch", true);
+			}
+			else if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+			{
+				if(ani.GetCurrentAnimatorStateInfo(0).IsName("Dance"))
+					ani.SetBool("Dance", false);
+
+				if(ani.GetCurrentAnimatorStateInfo(0).IsName("Kick"))
+					ani.SetBool("Kick", false);
+
+				if(ani.GetCurrentAnimatorStateInfo(0).IsName("Punch"))
+					ani.SetBool("Punch", false);
+			}
+		}
     }
 }
